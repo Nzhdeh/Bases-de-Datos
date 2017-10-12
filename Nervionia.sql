@@ -20,7 +20,11 @@ go
 create table Ser
 (
 	Nombre varchar(10) not null,
+	Nombre_Comun_Esp varchar(10) not null,
+	Nombre_Tribu varchar(10) not null,
 	constraint PK_Ser primary key (Nombre),
+	constraint FK_Ser_Especie foreign key (Nombre_Comun_Esp) references Especie(Nombre_Comun) ON DELETE NO ACTION ON UPDATE CASCADE,
+	constraint FK_Ser_Tribu foreign key (Nombre_Tribu) references Tribu(Nombre) ON DELETE NO ACTION ON UPDATE CASCADE,
 )
 
 go
@@ -146,7 +150,9 @@ go
 create table Ser_Libre
 (
 	Nombre varchar(10) not null,
+	Nombre_Ser varchar(10) not null,
 	constraint PK_Ser_Libre primary key (Nombre),
+	constraint FK_Ser_Libre_Ser foreign key (Nombre_Ser) references Ser (Nombre) ON DELETE NO ACTION ON UPDATE CASCADE,
 )
 
 go
@@ -158,8 +164,10 @@ create table Esclavo
 	Nombre varchar(10) not null,
 	Fecha date not null,
 	NombreSerLibre varchar(10) not null,
+	Nombre_Ser varchar(10) not null,
 	constraint PK_Esclavo primary key (Nombre),
 	constraint FK_Ser_Libre_Esclavo foreign key (NombreSerLibre) references Ser_Libre (Nombre) ON DELETE NO ACTION ON UPDATE CASCADE,
+	constraint FK_Esclavo_Ser foreign key (Nombre_Ser) references Ser (Nombre) ON DELETE NO ACTION,
 )
 
 go
