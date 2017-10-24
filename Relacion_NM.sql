@@ -36,7 +36,7 @@ create table Barcos_Vertidos
 	--indicamos que (CodigoMMSI_Barcos,ID_Vertidos) es la clave primaria de la tabla Barcos_Vertidos
 	constraint PK_Barcos_Vertidos primary key (CodigoMMSI_Barcos,ID_Vertidos),
 	--indicamos que CodigoMMSI_Barcos y ID_Vertidos son claves ajenas(FOREIGN KEY)
-	CONSTRAINT FK_Barcos_Vertidos Foreign Key (CodigoMMSI_Barcos) REFERENCES Barcos (CodigoMMSI),
-	CONSTRAINT FK_Vertidos_Barcos Foreign Key (ID_Vertidos) REFERENCES Vertidos (ID),
+	CONSTRAINT FK_Barcos_Vertidos Foreign Key (CodigoMMSI_Barcos) REFERENCES Barcos (CodigoMMSI) on update cascade on delete cascade,
+	CONSTRAINT FK_Vertidos_Barcos Foreign Key (ID_Vertidos) REFERENCES Vertidos (ID) on update cascade on delete cascade,
 )
 go
