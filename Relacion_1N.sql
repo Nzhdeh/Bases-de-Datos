@@ -22,5 +22,7 @@ create table Organizaciones
 	Orientacion_Ideologica varchar(10) not null,
 	DniLideres char(9) not null,
 	constraint PK_Organizaciones primary key (Nombre),
+	--usamos el metodo de propagacion de la clave primaria de la tabala LIDERES a la tabla ORGANIZACIONES
 	constraint FK_Lideres_Organizaciones foreign key (DniLideres) references Lideres (Dni) on update cascade on delete cascade,
 )
+go
