@@ -47,9 +47,9 @@ create table PasajeroAsientoVuelo
 	NumeroAsiento tinyint not null,
 	CodigoVuelo tinyint not null
 	constraint PK_PasajeroAsiento primary key(DNIPasajero),
-	constraint FK_PasajeroAsiento_Pasajero foreign key (DNIPasajero) references Pasajero (DNI) ON DELETE NO ACTION ON UPDATE CASCADE,
-	constraint FK_PasajeroAsiento_Asiento foreign key (FilaAsiento,CodigoVuelo) references Asiento (Fila,Numero) ON DELETE NO ACTION ON UPDATE CASCADE,
-	constraint FK_PasajeroAsiento_Vuelo foreign key (CodigoVuelo) references Vuelo (Codigo) ON DELETE NO ACTION ON UPDATE CASCADE,
+	constraint FK_PasajeroAsiento_Pasajero foreign key (DNIPasajero) references Pasajero (DNI) ON DELETE CASCADE ON UPDATE CASCADE,
+	constraint FK_PasajeroAsiento_Asiento foreign key (FilaAsiento,CodigoVuelo) references Asiento (Fila,Numero) ON DELETE CASCADE ON UPDATE CASCADE,
+	constraint FK_PasajeroAsiento_Vuelo foreign key (CodigoVuelo) references Vuelo (Codigo) ON DELETE CASCADE ON UPDATE CASCADE,
 )
 
 go
