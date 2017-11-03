@@ -7,7 +7,7 @@ go
 --creamos la tabla Cafe
 create table Cafes
 (
-	Nombres varchar(15) not null,
+	Nombres char(15) not null,
 	Origenes varchar (20) not null,
 	Precio decimal (5,2) not null,
 
@@ -56,7 +56,7 @@ go
 --entre las tablas Cafes y Propiedades
 create table CafesPropiedades
 (
-	NombreCafes varchar(15) not null,
+	NombreCafes char(15) not null,
 	IDPropiedades tinyint not null,
 
 	--indicamos cual es la clave primaria
@@ -72,7 +72,7 @@ go
 --entre las tablas Cafes y Mezclas
 create table CafesMezclas
 (
-	NombreCafes varchar(15) not null,
+	NombreCafes char(15) not null,
 	CodigoMezclas tinyint not null,
 	Proporcion decimal (5,2) not null,
 
