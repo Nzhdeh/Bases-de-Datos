@@ -50,23 +50,6 @@ create table Religion
 
 go
 
---drop table Tribu_Religion
-
-go
-
-create table Tribu_Religion
-(
-	NombreTribu varchar(10) not null,
-	NombreReligion varchar(10) not null,
-	Religion_Prohibida varchar(10) not null,
-	Religion_Oficial varchar(10) not null,
-	constraint PK_Tribu_Religion primary key(NombreTribu,NombreReligion),
-	constraint FK_Tribu_Religion foreign key (NombreTribu) references Tribu (Nombre) ON DELETE NO ACTION ON UPDATE CASCADE,
-	constraint FK_Religion_Tribu foreign key (NombreReligion) references Religion (Nombre) ON DELETE NO ACTION ON UPDATE CASCADE,
-)
-
-go
-
 --drop table Poblado
 
 create table Poblado
@@ -82,6 +65,11 @@ create table Poblado
 )
 
 go
+
+--drop table Tribu_Religion
+
+go
+
 
 create table Bando
 (
@@ -110,6 +98,47 @@ create table Batalla
 
 go
 
+create table Guerra
+(
+	Nombre varchar(10) not null,
+	FechaInicio date not null,
+	FechaFin date not null,
+	NombreBatalla varchar(10) not null,
+	constraint PK_Guerra primary key (Nombre),
+	constraint FK_Batalla_Guerra foreign key (NombreBatalla) references Batalla (Nombre) ON DELETE NO ACTION ON UPDATE CASCADE,
+)
+
+go
+
+--drop table Esclavo
+
+create table Esclavo
+(
+	Nombre varchar(10) not null,
+	Fecha date not null,
+	NombreSerLibre varchar(10) not null,
+	Nombre_Ser varchar(10) not null,
+	constraint PK_Esclavo primary key (Nombre),
+	constraint FK_Ser_Libre_Esclavo foreign key (NombreSerLibre) references Ser_Libre (Nombre) ON DELETE NO ACTION ON UPDATE CASCADE,
+	constraint FK_Esclavo_Ser foreign key (Nombre_Ser) references Ser (Nombre) ON DELETE NO ACTION,
+)
+
+go
+
+create table Tribu_Religion
+(
+	NombreTribu varchar(10) not null,
+	NombreReligion varchar(10) not null,
+	Religion_Prohibida varchar(10) not null,
+	Religion_Oficial varchar(10) not null,
+	constraint PK_Tribu_Religion primary key(NombreTribu,NombreReligion),
+	constraint FK_Tribu_Religion foreign key (NombreTribu) references Tribu (Nombre) ON DELETE NO ACTION ON UPDATE CASCADE,
+	constraint FK_Religion_Tribu foreign key (NombreReligion) references Religion (Nombre) ON DELETE NO ACTION ON UPDATE CASCADE,
+)
+
+go
+
+
 create table Batalla_Bando
 (
 	NombreBando varchar(10) not null,
@@ -133,18 +162,6 @@ create table Tribu_Batalla
 
 go
 
-create table Guerra
-(
-	Nombre varchar(10) not null,
-	FechaInicio date not null,
-	FechaFin date not null,
-	NombreBatalla varchar(10) not null,
-	constraint PK_Guerra primary key (Nombre),
-	constraint FK_Batalla_Guerra foreign key (NombreBatalla) references Batalla (Nombre) ON DELETE NO ACTION ON UPDATE CASCADE,
-)
-
-go
-
 --drop table Ser_Libre
 
 create table Ser_Libre
@@ -153,21 +170,6 @@ create table Ser_Libre
 	Nombre_Ser varchar(10) not null,
 	constraint PK_Ser_Libre primary key (Nombre),
 	constraint FK_Ser_Libre_Ser foreign key (Nombre_Ser) references Ser (Nombre) ON DELETE NO ACTION ON UPDATE CASCADE,
-)
-
-go
-
---drop table Esclavo
-
-create table Esclavo
-(
-	Nombre varchar(10) not null,
-	Fecha date not null,
-	NombreSerLibre varchar(10) not null,
-	Nombre_Ser varchar(10) not null,
-	constraint PK_Esclavo primary key (Nombre),
-	constraint FK_Ser_Libre_Esclavo foreign key (NombreSerLibre) references Ser_Libre (Nombre) ON DELETE NO ACTION ON UPDATE CASCADE,
-	constraint FK_Esclavo_Ser foreign key (Nombre_Ser) references Ser (Nombre) ON DELETE NO ACTION,
 )
 
 go
