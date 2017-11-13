@@ -23,18 +23,26 @@ create table Trabajadores	------TipoTrabajo en la relacion
 	DNI char(9) not null,
 	Nombres varchar (15) not null,
 	Apellidos varchar (20) not null,
+	CIFEmpresas char(9) not null,
 
 	--------------------------------
-	constraint PK_Trabajadores primary key (DNI)
+	constraint PK_Trabajadores primary key (DNI),
+
+	--------------------------------
+	constraint Fk_Empresas_Trabajadores foreign key (CIFEmpresas) references Empresas(CIF) on update no action on delete no action
 )
 go
 
 create table Espectaculos    ----relacion 1:N flecha hacia funciones
 (
 	ID tinyint not null,--inventado
+	DNITrabajadores char(9) not null,
 
 	--------------------------------
-	constraint PK_Espectaculos primary key (ID)
+	constraint PK_Espectaculos primary key (ID),
+
+	--------------------------------
+	constraint FK_Trabajadores_Coordina_Espectaculos foreign key (DNITrabajadores) references Trabajadores(DNI) on update cascade on delete cascade
 )
 go
 
@@ -42,9 +50,12 @@ create table Funciones
 (
 	ID tinyint not null,--inventado
 	Fechas datetime not null,
+	IDEspectaculo tinyint not null,
+	--------------------------------
+	constraint PK_Funciones primary key (ID),
 
 	--------------------------------
-	constraint PK_Funciones primary key (ID)
+	constraint FK_Espectaculos_Funciones foreign key (IDEspectaculo) references Espectaculos(ID) on update cascade on delete cascade
 )
 go
 
@@ -65,8 +76,13 @@ create table Artistas
 	Nombres varchar (15) not null,
 	Apellidos varchar (20) not null,
 	Profecion varchar(15) not null,
+	DNIRepresentantes char(9) not null,
+
 	--------------------------------
-	constraint PK_Artistas primary key (DNI)
+	constraint PK_Artistas primary key (DNI),
+
+	--------------------------------
+	constraint FK_Representantes_Artistas foreign key (DNIRepresentantes) references Representantes(DNI) on update cascade on delete cascade
 )
 go
 
@@ -85,17 +101,77 @@ create table Zonas
 (
 	Filas tinyint not null,
 	Asientos tinyint not null,
-	
+	IDEspacios char(9) not null,
 	--------------------------------
-	constraint PK_Zonas primary key (Filas)
+	constraint PK_Zonas primary key (Filas),
+
+	--------------------------------
+	constraint FK_Espacios_Zonas foreign key (IDEspacios) references Espacios(ID) on update cascade on delete cascade
 )
 go
 
 create table Localidades
 (
 	CodigoPostal char (5) not null,
-	
+	FilasZonas tinyint not null,
 	--------------------------------
-	constraint PK_Localidades primary key (CodigoPostal)
+	constraint PK_Localidades primary key (CodigoPostal),
+
+	--------------------------------
+	constraint FK_Zonas_Localidades foreign key (FilasZonas) references Zonas(Filas) on update cascade on delete cascade
+)
+go
+
+create table TrabajadoresEspectaculos
+(
+	DNITrabajadores char(9) not null,
+	IDEspectaculos tinyint not null,
+
+	--------------------------------
+	constraint PK_Trabajadores_Espectaculos primary key (DNITrabajadores,IDEspectaculos),
+
+	--------------------------------
+	constraint FK_Trabajadores_Espectaculos foreign key (DNITrabajadores) references Trabajadores (DNI) on update cascade on delete cascade,
+	constraint FK_Espectaculos_Trabajadores foreign key (IDEspectaculos) references Espectaculos (ID) on update no action on delete no action
+)
+go
+
+create table EspectaculosArtistas
+(
+	IDEspectaculos tinyint not null,
+	DNIArtistas char(9) not null,
+
+	--------------------------------
+	constraint PK_Espectaculos_Artistas primary key (IDEspectaculos,DNIArtistas),
+
+	--------------------------------
+	constraint FK_Artistas_Espectaculos foreign key (IDEspectaculos) references Espectaculos (ID) on update no action on delete no action,
+	constraint FK_Espectaculos_Artistas foreign key (DNIArtistas) references Artistas (DNI) on update cascade on delete cascade
+)
+go
+
+create table EspectaculosEspacios
+(
+	IDEspectaculos tinyint not null,
+	IDEspacios char(9) not null,
+	--------------------------------
+	constraint PK_Espectaculos_Espacios primary key (IDEspectaculos,IDEspacios),
+
+	--------------------------------
+	constraint FK_Espectaculos_Espacios foreign key (IDEspectaculos) references Espectaculos (ID) on update no action on delete no action,
+	constraint FK_Espacios_Espectaculos foreign key (IDEspacios) references Espacios (ID) on update cascade on delete cascade
+)
+go
+
+create table LocalidadesFunciones
+(
+	CodigoPostalLocalidades char (5) not null,
+	IDFunciones tinyint not null,
+	--------------------------------
+	constraint PK_Localidades_Funciones primary key (CodigoPostalLocalidades,IDFunciones),
+
+	--------------------------------
+	constraint FK_Localidades_Funciones foreign key (CodigoPostalLocalidades) references  Localidades (CodigoPostal) on update no action on delete no action,
+	constraint FK_Funciones_Localidades foreign key (IDFunciones) references Funciones (ID) on update cascade on delete cascade
 )
 go
