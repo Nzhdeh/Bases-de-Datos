@@ -18,7 +18,7 @@ go
 
 create table Organizaciones
 (
-	Nombre varchar(20) not null,
+	Nombre char(20) not null,
 	Campo_Actividad varchar(10) not null,
 	Orientacion_Ideologica varchar(10) not null,
 	DniLideres char(9) not null,--si quieremos que admita valores nulos ponemos NULL en vez de NOT NULL
