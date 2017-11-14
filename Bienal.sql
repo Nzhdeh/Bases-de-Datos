@@ -127,7 +127,7 @@ create table EmpresasTrabajadores
 	
 
 	--------------------------------
-	constraint PK_Trabajadores_Espectaculos primary key (DNITrabajadores),--porque es una relacion 1:N
+	constraint PK_Empresas_Trabajadores primary key (DNITrabajadores),--porque es una relacion 1:N
 
 	--------------------------------
 	constraint FK_Trabajadores_Empresas foreign key (CIFEmpresas) references Empresas (CIF) on update no action on delete no action,
