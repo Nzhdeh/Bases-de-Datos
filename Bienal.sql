@@ -23,13 +23,9 @@ create table Trabajadores	------TipoTrabajo en la relacion
 	DNI char(9) not null,
 	Nombres varchar (15) not null,
 	Apellidos varchar (20) not null,
-	CIFEmpresas char(9) not null,
 
 	--------------------------------
-	constraint PK_Trabajadores primary key (DNI),
-
-	--------------------------------
-	constraint Fk_Empresas_Trabajadores foreign key (CIFEmpresas) references Empresas(CIF) on update no action on delete no action
+	constraint PK_Trabajadores primary key (DNI)
 )
 go
 
@@ -122,17 +118,20 @@ create table Localidades
 )
 go
 
-create table TrabajadoresEspectaculos
+--relacion 1:N convertido en una N:M
+create table EmpresasTrabajadores
 (
-	DNITrabajadores char(9) not null,
-	IDEspectaculos tinyint not null,
+	CIFEmpresas char(9) not null,
+	DNITrabajadores char (9) not null,
+	TipoTrabajo varchar(10) null,
+	
 
 	--------------------------------
-	constraint PK_Trabajadores_Espectaculos primary key (DNITrabajadores,IDEspectaculos),
+	constraint PK_Trabajadores_Espectaculos primary key (CIFEmpresas,DNITrabajadores),
 
 	--------------------------------
-	constraint FK_Trabajadores_Espectaculos foreign key (DNITrabajadores) references Trabajadores (DNI) on update cascade on delete cascade,
-	constraint FK_Espectaculos_Trabajadores foreign key (IDEspectaculos) references Espectaculos (ID) on update no action on delete no action
+	constraint FK_Trabajadores_Empresas foreign key (CIFEmpresas) references Empresas (CIF) on update no action on delete no action,
+	constraint FK_Empresas_Trabajadores foreign key (DNITrabajadores) references Trabajadores (DNI) on update cascade on delete cascade
 )
 go
 
@@ -175,3 +174,4 @@ create table LocalidadesFunciones
 	constraint FK_Funciones_Localidades foreign key (IDFunciones) references Funciones (ID) on update cascade on delete cascade
 )
 go
+
