@@ -13,6 +13,7 @@ create table DatosRestrictivos
 	Nombre char (15) not null,
 	NumPelos int null,
 	TipoRopa char(1) null,
+	NumSuerte tinyint null,
 	Minutos tinyint null,
 
 	----------------------------------
