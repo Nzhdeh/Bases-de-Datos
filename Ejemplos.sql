@@ -9,7 +9,7 @@ go
 
 create table DatosRestrictivos
 (
-	ID smallint identity not null,
+	ID smallint identity (1,1) not null,
 	Nombre char (15) not null,
 	NumPelos int null,
 	TipoRopa char(1) null,
