@@ -159,7 +159,7 @@ create table ParcelasLimites
 )
 go
 -------------------------------------------------------------------------------
-alter table ParcelasLimites add constraint PK_ParcelasLimites primary key (NumCatastralParcelas)
+alter table ParcelasLimites add constraint PK_ParcelasLimites primary key (NumCatastralParcelas,LongitudLimites,LatitudLimites)
 go
 -------------------------------------------------------------------------------
 -------------------------------------FK's--------------------------------------
