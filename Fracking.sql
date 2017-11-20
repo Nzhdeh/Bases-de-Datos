@@ -9,7 +9,7 @@ go
 
 create table Parcelas
 (
-	NumCatastral tinyint not null,
+	NumCatastral tinyint not null, 
 	Extencion decimal (3,1) not null
 
 	----------PK-------------------
@@ -258,8 +258,8 @@ go
 
 create table PoliticosInformacion
 (
-	CodigoPoliticos tinyint not null,
-	IDInformaciones tinyint not null
+	IDInformaciones tinyint not null,
+	CodigoPoliticos tinyint not null
 )
 go
 -------------------------------------------------------------------------------
