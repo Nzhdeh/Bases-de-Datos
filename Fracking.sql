@@ -258,8 +258,8 @@ go
 
 create table PoliticosInformacion
 (
-	IDInformaciones tinyint not null,
-	CodigoPoliticos tinyint not null
+	CodigoPoliticos tinyint not null,
+	IDInformaciones tinyint not null
 )
 go
 -------------------------------------------------------------------------------
