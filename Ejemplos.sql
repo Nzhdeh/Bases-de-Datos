@@ -95,7 +95,7 @@ go
 
 alter table DatosRelacionados add constraint CK_PalabraTabu check (PalabraTabu not in('Barcenas', 'Gurtel', 'Punica', 'Bankia', 'Sobre') and PalabraTabu not like'[%eo]')
 go
-alter table DatosRelacionados add constraint CK_NumRarito check (NumRarito < 20 )--me falta los numeros primos
+alter table DatosRelacionados add constraint CK_NumRarito check (NumRarito < 20 and NumRarito not in (2,3,5,7,11,13,17))--me falta los numeros primos
 go
 alter table DatosRelacionados add constraint CK_NumMasgrande check (NumMasgrande between NumRarito and 1000)
 go
