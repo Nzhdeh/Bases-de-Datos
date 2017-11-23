@@ -7,17 +7,37 @@ go
 use Fracking
 go
 
+create table Zonas
+(
+	ID tinyint not null, 
+	Ubicacion tinyint not null,
+	Extension tinyint not null
+
+	----------PK-------------------
+	--constraint PK_Zonas primary key (ID)
+)
+go
+
+-------------------------------------------------------------------------------
+alter table Zonas add constraint PK_Zonas primary key (ID)
+go
+-------------------------------------------------------------------------------
+
 create table Parcelas
 (
 	NumCatastral tinyint not null, 
-	Extencion decimal (3,1) not null
-
+	Extencion decimal (3,1) not null,
+	IDZonas tinyint not null
 	----------PK-------------------
 	--constraint PK_Parcelas primary key (NumCatastral)
 )
 go
 -------------------------------------------------------------------------------
 alter table Parcelas add constraint PK_Parcelas primary key (NumCatastral)
+go
+-------------------------------------------------------------------------------
+-------------------------------------FK's--------------------------------------
+alter table Parcelas add constraint FK_Zonas_Parcelas foreign key (IDZonas) references Zonas(ID) on update cascade on delete cascade
 go
 -------------------------------------------------------------------------------
 
@@ -83,7 +103,6 @@ create table Actos
 	ID tinyint not null,
 	Lugar varchar(15) not null,
 	Momento datetime not null,
-	AliasEspias char(10) not null
 
 	----------PK-------------------
 	--constraint PK_Actos primary key (ID)
@@ -97,7 +116,9 @@ go
 create table Instituciones
 (
 	Nombres char(15) not null,
-	CodigoPostal tinyint not null
+	CodigoPostal tinyint not null,
+	Direccion varchar (40) not null,
+	Telefono char (9) not null
 
 	----------PK-------------------
 	--constraint PK_Instituciones primary key (Nombres,CodigoPostal)
@@ -107,10 +128,6 @@ go
 alter table Instituciones add constraint PK_Instituciones primary key (Nombres,CodigoPostal)
 go
 -------------------------------------------------------------------------------
--------------------------------------FK's--------------------------------------
-alter table Actos add constraint FK_Actos_Espias foreign key (AliasEspias) references Espias(Alias) on update cascade on delete cascade
-go
--------------------------------------------------------------------------------
 
 create table Politicos
 (
@@ -118,9 +135,7 @@ create table Politicos
 	Nombres varchar(15) not null,
 	Apellidos varchar(20) not null,
 	Direcciones varchar (30) not null,
-	Categoria varchar not null,
-	NombresInstituciones char(15) not null,
-	CodigoPostalInstituciones tinyint not null
+	Categoria varchar not null
 
 	----------PK-------------------
 	--constraint PK_Politicos primary key (Codigo)
@@ -128,10 +143,6 @@ create table Politicos
 go
 -------------------------------------------------------------------------------
 alter table Politicos add constraint PK_Politicos primary key (Codigo)
-go
--------------------------------------------------------------------------------
--------------------------------------FK's--------------------------------------
-alter table Politicos add constraint FK_Politicos_Institucion foreign key (NombresInstituciones,CodigoPostalInstituciones) references Instituciones(Nombres,CodigoPostal) on update cascade on delete cascade
 go
 -------------------------------------------------------------------------------
 
@@ -151,6 +162,41 @@ go
 
 /************************************************************/
 
+create table InstitucionesPoliticos
+(
+	NombresInstituciones char(15) not null,
+	CodigoPostalInstituciones tinyint not null,
+	CodigoPoliticos tinyint not null
+)
+go
+-------------------------------------------------------------------------------
+alter table InstitucionesPoliticos add constraint PK_InstitucionesPoliticos primary key (NombresInstituciones,CodigoPostalInstituciones,CodigoPoliticos)
+go
+-------------------------------------------------------------------------------
+-------------------------------------FK's--------------------------------------
+alter table InstitucionesPoliticos add constraint FK_Instituciones_Politicos foreign key (NombresInstituciones,CodigoPostalInstituciones) references Instituciones(Nombres,CodigoPostal) on update cascade on delete cascade
+go
+alter table InstitucionesPoliticos add constraint FK_Politicos_Instituciones foreign key (CodigoPoliticos) references Politicos(Codigo) on update no action on delete no action
+go
+-------------------------------------------------------------------------------
+
+create table ActosEspias
+(
+	AliasEspias char(10) not null,
+	IDActos tinyint not null
+)
+go
+-------------------------------------------------------------------------------
+alter table ActosEspias add constraint PK_ActosEspias primary key (AliasEspias,IDActos)
+go
+-------------------------------------------------------------------------------
+-------------------------------------FK's--------------------------------------
+alter table ActosEspias add constraint FK_Espias_Actos foreign key (AliasEspias) references Espias(Alias) on update cascade on delete cascade
+go
+alter table ActosEspias add constraint FK_Actos_Espias foreign key (IDActos) references Actos(ID) on update cascade on delete cascade
+go
+-------------------------------------------------------------------------------
+
 create table ParcelasLimites
 (
 	NumCatastralParcelas tinyint not null,
@@ -169,20 +215,20 @@ alter table ParcelasLimites add constraint FK_Limites_Parcelas foreign key (Long
 go
 -------------------------------------------------------------------------------
 
-create table ParcelasAsociaciones
+create table ZonasAsociaciones
 (
-	NumCatastralParcelas tinyint not null,
+	IDZonas tinyint not null,
 	NombresAsociaciones char (20) not null
 )
 go
 -------------------------------------------------------------------------------
-alter table ParcelasAsociaciones add constraint PK_ParcelasAsociaciones primary key (NumCatastralParcelas,NombresAsociaciones)
+alter table ZonasAsociaciones add constraint PK_ZonasAsociaciones primary key (IDZonas,NombresAsociaciones)
 go
 -------------------------------------------------------------------------------
 -------------------------------------FK's--------------------------------------
-alter table ParcelasAsociaciones add constraint FK_Parcelas_Asociaciones foreign key (NumCatastralParcelas) references Parcelas(NumCatastral) on update cascade on delete cascade
+alter table ZonasAsociaciones add constraint FK_Zonas_Asociaciones foreign key (IDZonas) references Zonas(ID) on update cascade on delete cascade
 go
-alter table ParcelasAsociaciones add constraint FK_Asociaciones_Parcelas foreign key (NombresAsociaciones) references Asociaciones(Nombre) on update cascade on delete cascade
+alter table ZonasAsociaciones add constraint FK_Asociaciones_Zonas foreign key (NombresAsociaciones) references Asociaciones(Nombre) on update cascade on delete cascade
 go
 -------------------------------------------------------------------------------
 
