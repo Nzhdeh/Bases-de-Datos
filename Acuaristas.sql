@@ -153,20 +153,6 @@ create table Plantas
 )
 go
 
---create table Socios
---(
---	NumeroSocio smallint not null,
---	Nombre varchar (15) not null,
---	Apellidos varchar (20) not null,
---	Direccion varchar (40) not null,
---	Email varchar (30) null,
---	Telefono char (9) not null,
-
---	------------------------------
---	constraint PK_Socios primary key (NumeroSocio)
---)
---go
-
 create table Alimentos 
 (
 	ID smallint not null,
@@ -255,8 +241,8 @@ go
 alter table Plantas add constraint CK_NecesidadLuz check (NecesidadLuz between 4 and 10)
 go
 --Una especie no puede ser incompatible con ella misma.
---alter table PezIncompatibleConPez add constraint CK*********************************
---go
+alter table PezIncompatibleConPez add constraint CK_IDSerVivoPecesIncompatible check (IDSerVivoPecesIncompatible <> IDSerVivoPeces)
+go
 -- Los porcentajes de arcillas, silicatos, nitratos, sustratos y otros sumados deben ser igual a 100.
 alter table Tierras add constraint CK_CantidadMezcla check (arcillas+silicatos+nitratos+sustratos+otros=100)
 go
