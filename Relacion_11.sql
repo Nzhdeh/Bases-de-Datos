@@ -1,3 +1,5 @@
+--use master
+--go
 --drop database Relacion_11
 
 create database Relacion_11
@@ -24,6 +26,7 @@ create table Pasajeros
 	NumeroAsientoAsientos tinyint not null,
 	constraint PK_Pasajeros primary key (ID),
 	constraint FK_Pasajeros_Asientos foreign key (NumeroAsientoAsientos) references Asientos(NumeroAsiento) on update cascade on delete cascade,
+	constraint UQ_Pasajeros_Asientos unique (NumeroAsientoAsientos)--si no ponemos unique no sabremos si es una relacion 1:N o 1:1
 )
 go
 
@@ -55,9 +58,14 @@ create table Entradas_Personas
 (
 	IDEntrada tinyint not null,
 	DNIPersina varchar(9) not null,
+	------------------------------------------
 	constraint PK_Entradas_Personas primary key (IDEntrada,DNIPersina),
+	------------------------------------------
 	constraint FK_Entradas_Personas foreign key (IDEntrada) references Entradas(ID) on update cascade on delete cascade,
+	constraint UQ_Entradas_Personas unique (IDEntrada),
+	------------------------------------------
 	constraint FK_Personas_Entradas foreign key (DNIPersina) references Personas(DNI) on update cascade on delete cascade,
+	constraint UQ_Personas_Entradas unique (DNIPersina)
 )
 go
 
