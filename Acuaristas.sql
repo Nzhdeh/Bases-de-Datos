@@ -76,23 +76,34 @@ go
 create table Bombas
 (
 	Marca char (15) not null,
-	ModeloModelos char (15) not null,
+	Modelo char (15) not null,
 	IDAcuario smallint not null,
 
 	------------------------------
-	constraint PK_Bombas primary key (Marca)
+	constraint PK_Bombas primary key (Marca,Modelo)
 )
 go
 
---incumplia la 3FN por eso he creado una nueva tabla
-create table Modelos
+--incumplia la 2FN por eso he creado una nueva tabla
+create table Caracteristicas
 (
-	Modelo char (15) not null,
+	ID smallint not null,
 	Caudal smallint not null,
 	Consumo smallint not null,
 
 	------------------------------
-	constraint PK_Modelos primary key (Modelo)
+	constraint PK_Caracteristicas primary key (ID)
+)
+go
+
+create table CaracteristicasBombas
+(
+	IDCaracteristicas smallint not null,
+	MarcaBombas char (15) not null,
+	ModeloBombas char (15) not null,
+
+	------------------------------
+	constraint PK_CaracteristicasBombas primary key (IDCaracteristicas,MarcaBombas,ModeloBombas)
 )
 go
 
@@ -186,9 +197,13 @@ alter table SeresVivosAcuarios add constraint FK_Acuarios_SeresVivos foreign key
 go
 
 
-alter table Bombas add constraint FK_Bombas_Modelos foreign key (ModeloModelos) references Modelos (Modelo) on delete cascade on update cascade----------1:N
-go
 alter table Bombas add constraint FK_Bombas_Acuarios foreign key (IDAcuario) references Acuarios (ID) on delete cascade on update cascade
+go
+
+
+alter table CaracteristicasBombas add constraint FK_Caracteristicas foreign key (IDCaracteristicas) references Caracteristicas (ID) on delete cascade on update cascade
+go
+alter table CaracteristicasBombas add constraint FK_Bombas foreign key (MarcaBombas,ModeloBombas) references Bombas (Marca,Modelo) on delete cascade on update cascade
 go
 
 
