@@ -255,11 +255,15 @@ go
 --Ante la proliferación de peces tropicales, que tienen varios colores, observamos que con el
 --modelo actual no podemos recoger esta información porque incumpliríamos una de las
 --formas normales.
---¿Cuál?
+--¿Cuál? 
+		--La primera forma normal
 --¿Cómo podemos solucionarlo? Escribe el código para hacer esas modificaciones.
+		--creando otra tabla
 
 --Ejercicio 5
 --Deseamos saber qué tipo o tipos de tierra tiene cada acuario.
 --¿Es posible con el modelo actual?
+		-- A traves de SeresVivos, Plantas Se puede llegar a Tierras
 --En caso de que no sea posible, ¿qué habríamos de añadir o modificar para tener esta
 --información?
+		--la mejor solucion es crear una relacion N:M entre TIERRAS Y ACUARIOS
