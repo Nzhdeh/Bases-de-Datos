@@ -273,12 +273,11 @@ go
 --¿Cuál? 
 		--La primera forma normal
 --¿Cómo podemos solucionarlo? Escribe el código para hacer esas modificaciones.
-		--creando otra tabla
-
+		--creando otra tabla y relaciono con Peces
 --Ejercicio 5
 --Deseamos saber qué tipo o tipos de tierra tiene cada acuario.
 --¿Es posible con el modelo actual?
-		-- A traves de SeresVivos, Plantas Se puede llegar a Tierras
+		-- No se puede saber porque la relacion entre Acuarios y SeresVivos es N:M
 --En caso de que no sea posible, ¿qué habríamos de añadir o modificar para tener esta
 --información?
 		--la mejor solucion es crear una relacion N:M entre TIERRAS Y ACUARIOS
