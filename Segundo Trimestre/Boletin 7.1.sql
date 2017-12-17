@@ -31,20 +31,25 @@ select ProductName,UnitPrice from Products
 order by UnitPrice desc
 go
 --5. Nombre de la compañía y dirección completa de cada proveedor de algún país de América del Norte.
-select CompanyName,[Address],City,Country from Suppliers/************************/
-
+select CompanyName,[Address],City,Country from Suppliers
+where Country in( 'USA','Mexico','Canada')
+go
 --6. Nombre del producto, número de unidades en stock y valor total del stock, de los
 --productos que no sean de la categoría 4.
-
+select ProductName,UnitsInStock,UnitPrice from Products
+where CategoryID<>4
+go
 
 --7. Clientes (Nombre de la Compañía, dirección completa, persona de contacto) que no
 --residan en un país de América del Norte y que la persona de contacto no sea el
 --propietario de la compañía
-
+select CompanyName,[Address],City,PostalCode,Country,ContactName from Customers
+where Country not in( 'USA','Mexico','Canada') --propietario de la compañia
+go
 
 --8. ID del cliente y número de pedidos realizados por cada cliente, ordenado de mayor a
 --menor número de pedidos.
-
+select * from Orders
 
 --9. Número de pedidos enviados a cada ciudad, incluyendo el nombre de la ciudad.
 
