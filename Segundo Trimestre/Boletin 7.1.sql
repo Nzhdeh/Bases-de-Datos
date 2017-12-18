@@ -21,14 +21,14 @@ go
 
 --3. Nombre, Apellidos, Ciudad y Edad de todos los empleados, ordenados por antigüedad en la empresa.
 select LastName,FirstName,City,(year(CURRENT_TIMESTAMP)-year(BirthDate)) as Edad from Employees
-order by HireDate asc
+order by HireDate asc --se ordena de menor a mayor 
 go
 --select LastName,FirstName,HireDate from Employees		--para comprobar
 --order by HireDate asc
 
 --4. Nombre y precio de cada producto, ordenado de mayor a menor precio.
 select ProductName,UnitPrice from Products
-order by UnitPrice desc
+order by UnitPrice desc --se ordena de mayor a menor
 go
 --5. Nombre de la compañía y dirección completa de cada proveedor de algún país de América del Norte.
 select CompanyName,[Address],City,Country from Suppliers
@@ -51,7 +51,7 @@ go
 --menor número de pedidos.
 select CustomerID,count(OrderID) as [Pedidos Realizados] from Orders
 group by CustomerID
-order by [Pedidos Realizados] desc
+order by [Pedidos Realizados] desc --se ordena de mayor a menor
 go
 
 --9. Número de pedidos enviados a cada ciudad, incluyendo el nombre de la ciudad.
