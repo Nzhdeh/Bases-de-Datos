@@ -44,14 +44,22 @@ go
 --residan en un país de América del Norte y que la persona de contacto no sea el
 --propietario de la compañía
 select CompanyName,[Address],City,PostalCode,Country,ContactName from Customers
-where Country not in( 'USA','Mexico','Canada') --propietario de la compañia
+where Country not in( 'USA','Mexico','Canada') and ContactTitle!='Cowner'
 go
 
 --8. ID del cliente y número de pedidos realizados por cada cliente, ordenado de mayor a
 --menor número de pedidos.
-select * from Orders
+select CustomerID,count(OrderID) as [Pedidos Realizados] from Orders
+group by CustomerID
+order by [Pedidos Realizados] desc
+go
 
 --9. Número de pedidos enviados a cada ciudad, incluyendo el nombre de la ciudad.
-
+select ShipCity,count(OrderID) as [NumeroPedidosPorCiudad] from Orders
+group by ShipCity
+go
 
 --10. Número de productos de cada categoría. 
+select CategoryID,count(CategoryID) as [Número de productos de cada categorí] from Products
+group by CategoryID
+go
