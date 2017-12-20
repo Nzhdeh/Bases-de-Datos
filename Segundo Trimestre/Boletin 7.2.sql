@@ -51,15 +51,36 @@ insert into authors
 (au_id,au_lname,au_fname,phone,[address],city,state,zip,[contract])
 values ('172-44-1178','Yeghiazaryan','Nzhdeh','628-898-105','666 Calle Satanas','Sevilla','AN','12345',0)
 go
+
 --2. Inserta dos libros, escritos por el autor que has insertado antes y publicados por la editorial "Ramona publishers”.
 --select * from titles
 insert into titles
 (title_id,title,[type],pub_id,price,advance,royalty,ytd_sales,notes,pubdate)
 values('AM5555','Cataluña se va de vacaciones?','cachondeo',null,null,0,null,300,'Ooooo what a pity!','10-10-2017 00:00:00.000')
 go
---3. Modifica la tabla jobs para que el nivel mínimo sea 90.
---select * from jobs
-alter table jobs add constraint CK_min_lvl check (min_lvl=90)/*********************************/
 
+--3. Modifica la tabla jobs para que el nivel mínimo sea 90.
+
+begin transaction
+	update jobs
+	set min_lvl=90
+--commit
+rollback
+--select * from jobs
+go
 --4. Crea una nueva editorial (publihers) con ID 9908, nombre Mostachon Books y sede en Utrera.
+select * from publishers
+insert into publishers
+(pub_id,pub_name,city,[state],country)
+values ('9908','Mostachon Books','Utrera',null,null)
+go
+
 --5. Cambia el nombre de la editorial con sede en Alemania para que se llame "Machen Wücher" y traslasde su sede a Stuttgart
+
+--select * from publishers
+begin transaction 
+	update publishers
+	set pub_name='Machen Wücher'
+	where country='Germany'
+--commit
+rollback
