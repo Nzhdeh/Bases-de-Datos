@@ -36,7 +36,7 @@ where Country in( 'USA','Mexico','Canada')
 go
 --6. Nombre del producto, número de unidades en stock y valor total del stock, de los
 --productos que no sean de la categoría 4.
-select ProductName,UnitsInStock,UnitPrice from Products
+select ProductName,UnitsInStock,UnitPrice*UnitsInStock as [Valor Total] from Products
 where CategoryID<>4
 go
 
