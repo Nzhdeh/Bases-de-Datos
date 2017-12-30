@@ -45,11 +45,17 @@ values  (CURRENT_TIMESTAMP,37,13,'PH002')
 go
 --Todos los perros del cliente 104 han enfermado el 20 de diciembre de sarna.
 --Escribe un SELECT para averiguar los códigos de todos los perros del cliente 104
+--select * from BI_Mascotas_Enfermedades
+--select * from BI_Mascotas
+select * from BI_Mascotas as M
+inner join BI_Mascotas_Enfermedades as ME on M.Codigo=ME.Mascota
+
 
 --Con los códigos obtenidos en la consulta anterior, escribe los INSERT correspondientes en la tabla BI_Mascotas_Enfermedades
 
 --Escribe una consulta para obtener el nombre, especie y raza de todas las mascotas, ordenados por edad.
-
+select Alias,Especie,Raza from BI_Mascotas
+order by FechaNacimiento
 --Escribe los códigos de todas las mascotas que han ido alguna vez al veterinario un lunes o un viernes. Para averiguar el 
 --dia de la semana de una fecha se usa la función DATEPART (WeekDay, fecha) que devuelve un entero entre 1 y 7 donde el 1 
 --corresponde al lunes, el dos al martes y así sucesivamente.
