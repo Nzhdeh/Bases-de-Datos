@@ -10,8 +10,10 @@ group by Country
 order by Country asc
 go
 --2. ID de producto y número de unidades vendidas de cada producto. 
---select * from Products
-select ProductID from Products/**************************************/
+--select * from [Order Details]
+select ProductID,count(Quantity) as [Número de unidades vendidas por producto] from [Order Details]
+group by ProductID
+go
 --3. ID del cliente y número de pedidos que nos ha hecho.
 --select * from Orders
 select CustomerID,count(*) as [Numero de pedidos hechos] from Orders
@@ -33,10 +35,18 @@ select SupplierID,sum(UnitsInStock) as [Importe total por proveedor] from Produc
 group by SupplierID,UnitsInStock
 go
 --7. Número de pedidos registrados mes a mes de cada año.
-
+--select * from Orders
+select * from Orders/*****************************/
+go
 --8. Año y tiempo medio transcurrido entre la fecha de cada pedido (OrderDate) y la fecha en la que lo hemos enviado 
 --(ShipDate), en días para cada año.
-
+select day((OrderDate-ShippedDate)) from Orders/***************************************/
+go
 --9. ID del distribuidor y número de pedidos enviados a través de ese distribuidor.
-
+select ShipVia,count(OrderID) as [Numero de pedidos enviados] from Orders
+group by ShipVia
+go
 --10. ID de cada proveedor y número de productos distintos que nos suministra.
+select SupplierID,count(ProductID) as [Numero de productos distintos suministrados] from Products--se puede poner distinct
+group by SupplierID
+go
