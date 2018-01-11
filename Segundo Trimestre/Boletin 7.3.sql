@@ -10,7 +10,7 @@ where Color in ('Red','Yellow') and StandardCost between 50 and 500
 --Nombre, número de producto, precio de coste,  precio de venta, margen de beneficios total y margen de beneficios en % del precio 
 --de venta de los productos de categorías inferiores a 16
 --select * from Production.Product
-select Name,ProductNumber,StandardCost,ListPrice,ListPrice-StandardCost as [Margen de Beneficios],(ListPrice-StandardCost)/StandardCost*100 as [Beneficios en %]  from Production.Product
+select Name,ProductNumber,StandardCost,ListPrice,ListPrice-StandardCost as [Margen de Beneficios],((ListPrice-StandardCost)/StandardCost)*100 as [Beneficios en %]  from Production.Product
 where ProductSubcategoryID<16
 
 --Empleados cuyo nombre o apellidos contenga la letra "r". Los empleados son los que tienen el valor "EM" en la columna PersonType de la tabla Person
