@@ -23,6 +23,7 @@ values  ('MH002','Boxer','Perro','2-11-2000','2-2-2017','Niculin',108)
 go
 --Escribe un SELECT para obtener los IDs de las enfermedades que ha sufrido alguna mascota (una cualquiera). 
 --Los IDs no deben repetirse
+--select * from BI_Mascotas_Enfermedades
 select distinct IDEnfermedad from BI_Mascotas_Enfermedades/************************************/
 go
 --El cliente Josema Ravilla ha llevado a visita a todas sus mascotas.
