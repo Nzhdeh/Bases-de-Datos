@@ -1,3 +1,4 @@
+
 use pubs
 go
 
@@ -80,7 +81,8 @@ go
 --select * from publishers
 begin transaction 
 	update publishers
-	set pub_name='Machen Wücher'
+	set pub_name='Machen Wücher',
+		city='Stuttgart'
 	where country='Germany'
 --commit
 rollback
