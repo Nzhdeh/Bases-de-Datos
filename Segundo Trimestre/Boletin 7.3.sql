@@ -4,7 +4,7 @@ use AdventureWorks2012
 go
 --Nombre, numero de producto, precio y color de los productos de color rojo o amarillo cuyo precio esté comprendido entre 50 y 500
 --select * from Production.Product
-select Name,ProductNumber,ListPrice,Color from Production.Product
+select [Name],ProductNumber,ListPrice,Color from Production.Product
 where Color in ('Red','Yellow') and StandardCost between 50 and 500
 
 --Nombre, número de producto, precio de coste,  precio de venta, margen de beneficios total y margen de beneficios en % del precio 
