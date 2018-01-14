@@ -1,3 +1,4 @@
+
 --Base de datos: AdventureWorks2012
 use AdventureWorks2012
 go
@@ -15,9 +16,13 @@ go
 --3.Nombre del producto, código, número, tamaño y peso de los productos que estaban a 
 --la venta durante todo el mes de septiembre de 2002. No queremos que aparezcan aquellos 
 --cuyo peso sea superior a 2000.
+select Name,ProductID,ProductNumber,Size,[Weight] from Production.Product
+where SellStartDate<'31-8-2002' and SellEndDate>'30-9-2002' and [Weight]<=2000
 
 --4.Margen de beneficio de cada producto (Precio de venta menos el coste), y porcentaje 
 --que supone respecto del precio de venta.
+select ListPrice-StandardCost as [Margen de Beneficio],(100*(ListPrice-StandardCost))/StandardCost as [Porcentaje] from Production.Product
+where StandardCost!=0
 
 
 --Consultas de dificultad media
