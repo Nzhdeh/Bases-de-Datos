@@ -24,7 +24,8 @@ go
 --Escribe un SELECT para obtener los IDs de las enfermedades que ha sufrido alguna mascota (una cualquiera). 
 --Los IDs no deben repetirse
 --select * from BI_Mascotas_Enfermedades
-select IDEnfermedad from BI_Mascotas_Enfermedades/************************************/
+select distinct IDEnfermedad from BI_Mascotas_Enfermedades
+
 go
 --El cliente Josema Ravilla ha llevado a visita a todas sus mascotas.
 --Escribe un SELECT para averiguar el código de Josema Ravilla.
