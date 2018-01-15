@@ -13,11 +13,13 @@ where Color in ('Red','Yellow') and StandardCost between 50 and 500
 select Name,ProductNumber,StandardCost,ListPrice,ListPrice-StandardCost as [Margen de Beneficios],((ListPrice-StandardCost)/StandardCost)*100 as [Beneficios en %]  from Production.Product
 where ProductSubcategoryID<16
 
---Empleados cuyo nombre o apellidos contenga la letra "r". Los empleados son los que tienen el valor "EM" en la columna PersonType de la tabla Person
+--Empleados cuyo nombre o apellidos contenga la letra "r". Los empleados son los que tienen el valor "EM" 
+--en la columna PersonType de la tabla Person
 select * from Person.Person
 where  PersonType='EM' and (FirstName like ('%r%') or MiddleName  like ('%r%') or LastName  like ('%r%'))
 
---LoginID, nationalIDNumber, edad y puesto de trabajo (jobTitle) de los empleados (tabla Employees) de sexo femenino que tengan más de cinco años de antigüedad
+--LoginID, nationalIDNumber, edad y puesto de trabajo (jobTitle) de los empleados (tabla Employees) de sexo femenino que 
+--tengan más de cinco años de antigüedad
 select LoginID,NationalIDNumber,year(CURRENT_TIMESTAMP)-year(BirthDate) as [Edad],JobTitle from HumanResources.Employee
 where Gender='F' and year(CURRENT_TIMESTAMP)-year(HireDate)>5
 
