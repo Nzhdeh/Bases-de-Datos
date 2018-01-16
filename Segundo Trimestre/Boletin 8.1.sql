@@ -36,11 +36,14 @@ group by SupplierID,UnitsInStock
 go
 --7. Número de pedidos registrados mes a mes de cada año.
 --select * from Orders
-select * from Orders/*****************************/
+select year(OrderDate) as [Año],datename(month,OrderDate) as [Mes],count(OrderID) as [Numero de productos] from Orders
+group by year(OrderDate),datename(month,OrderDate),month(OrderDate)
+order by [Año],datepart(month,OrderDate)--para ordenar los meses
 go
 --8. Año y tiempo medio transcurrido entre la fecha de cada pedido (OrderDate) y la fecha en la que lo hemos enviado 
 --(ShipDate), en días para cada año.
-select day((OrderDate-ShippedDate)) from Orders/***************************************/
+select year(OrderDate) as [Año],avg(datediff(day,OrderDate,ShippedDate)) as [Tiempo medio transcurrido en dias] from Orders
+group by year(OrderDate)
 go
 --9. ID del distribuidor y número de pedidos enviados a través de ese distribuidor.
 select ShipVia,count(OrderID) as [Numero de pedidos enviados] from Orders
