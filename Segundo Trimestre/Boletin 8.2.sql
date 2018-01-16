@@ -30,15 +30,15 @@ group by country
 go
 
 --5. Número de unidades vendidas de cada libro en cada año (title_id, unidades y año).
---select * from titles
-select title_id,pubdate,count(pub_id) as [Numero de unidades vendidas cada año] from titles
-group by title_id,pubdate/*************************/
+--select * from sales
+select year(ord_date) as [Año],count (stor_id) as [Número de unidades vendidas de cada libro] from sales
+group by year(ord_date)
 go
 
 --6. Número de autores que han escrito cada libro (title_id y numero de autores).
---select * from titles
-select title_id,count(*) as [Numero de autores] from titles
-group by title_id/*****************************/
+--select * from titleauthor
+select title_id,count(au_id) as [Numero de autores] from titleauthor
+group by title_id
 go
 
 --7. ID, Titulo, tipo y precio de los libros cuyo adelanto inicial (advance) tenga un valor superior a $7.000,
