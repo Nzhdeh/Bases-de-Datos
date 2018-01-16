@@ -28,6 +28,10 @@ where StandardCost!=0
 --Consultas de dificultad media
 
 --5.Número de productos de cada categoría
+select count(PC.ProductCategoryID) from Production.ProductCategory as PC
+inner join Production.ProductSubcategory as PS on PC.ProductCategoryID=PS.ProductCategoryID
+inner join Production.Product as P on PS.ProductSubcategoryID=P.ProductSubcategoryID
+
 
 --6.Igual a la anterior, pero considerando las categorías generales (categorías de categorías).
 
