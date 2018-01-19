@@ -28,17 +28,27 @@ where StandardCost!=0
 --Consultas de dificultad media
 
 --5.Número de productos de cada categoría
-select count(PC.ProductCategoryID) from Production.ProductCategory as PC
+--select * from Production.Product
+select count(P.ProductID) as [Número de productos],PC.[Name] from Production.ProductCategory as PC
 inner join Production.ProductSubcategory as PS on PC.ProductCategoryID=PS.ProductCategoryID
 inner join Production.Product as P on PS.ProductSubcategoryID=P.ProductSubcategoryID
-
+group by PC.[Name]
 
 --6.Igual a la anterior, pero considerando las categorías generales (categorías de categorías).
 
 --7.Número de unidades vendidas de cada producto cada año.
+select count(SOH.SalesOrderID) as [Número de unidades vendidas de cada producto cada año],SOD.ProductID,year(SOH.OrderDate) as [Año] from Sales.SalesOrderHeader as SOH
+inner join Sales.SalesOrderDetail as SOD on SOH.SalesOrderID=SOD.SalesOrderID
+group by SOD.ProductID,year(SOH.OrderDate)
+order by SOD.ProductID
 
 --8.Nombre completo, compañía y total facturado a cada cliente
-
+--select * from Sales.SalesOrderHeader
+select P.FirstName,P.MiddleName,P.LastName from Person.Person as P
+inner join Sales.Customer as C on P.BusinessEntityID=C.PersonID/**************************/
+inner join Sales.SalesOrderHeader as SOH on C.PersonID=SOH.CustomerID
+inner join Sales.SalesOrderDetail as SOD on SOH.SalesOrderID=SOD.SalesOrderID
+ 
 --9.Número de producto, nombre y precio de todos aquellos en cuya descripción aparezcan 
 --las palabras "race”, "competition” o "performance”
 
