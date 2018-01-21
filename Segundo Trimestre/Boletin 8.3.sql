@@ -51,7 +51,13 @@ inner join Sales.SalesOrderDetail as SOD on SOH.SalesOrderID=SOD.SalesOrderID
  
 --9.Número de producto, nombre y precio de todos aquellos en cuya descripción aparezcan 
 --las palabras "race”, "competition” o "performance”
-
+--select * from Sales.SpecialOffer
+--select * from Production.Product
+select P.ProductNumber,P.Name,P.StandardCost,P.ListPrice from Production.Product as P
+inner join Sales.SpecialOfferProduct as SOP on P.ProductID=SOP.ProductID
+inner join Sales.SpecialOffer as SO on SOP.SpecialOfferID=SO.SpecialOfferID
+where SO.[Description] in ('race','competition','performance')
+go
 
 --Consultas avanzadas
 
