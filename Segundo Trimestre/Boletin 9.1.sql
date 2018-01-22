@@ -12,21 +12,43 @@ go
 --select * from Suppliers
 select LastName,FirstName ,HomePhone,City from Employees
 where City in ('New York','Seattle','Vermont','Columbia','Los Angeles','Redmond','Atlanta')
-
+go
 --Número de productos de cada categoría y nombre de la categoría.
-
-
+select count(P.ProductID) as [Número de productos de cada categoría],C.CategoryName from Products as P
+inner join Categories as C on P.CategoryID=P.CategoryID
+group by C.CategoryName
+go
 --Nombre de la compañía de todos los clientes que hayan comprado queso de cabrales o tofu.
-
-
+select C.CompanyName,/*P.ProductName*/ from Customers as C
+inner join Orders as O on C.CustomerID=O.CustomerID
+inner join [Order Details] as OD on O.OrderID=OD.OrderID
+inner join Products as P on OD.ProductID=P.ProductID
+where P.ProductName in('queso de cabrales','tofu')
+go
 --Empleados (ID, nombre, apellidos y teléfono) que han vendido algo a Bon app' o Meter Franken.
+--select * from Employees
+--select ShipName from Orders
 
+Select E.EmployeeID, E.LastName, E.FirstName, E.HomePhone from Employees as E
+inner join Orders as O on E.EmployeeID=O.EmployeeID
+inner join Customers as C on O.CustomerID=C.CustomerID
+where CompanyName in('Bon app''','Meter Franken')
+go
 
 --Empleados (ID, nombre, apellidos, mes y día de su cumpleaños) que no han vendido nunca nada a ningún cliente de Francia. *
+--select * from Employees
 
+select E.EmployeeID, E.LastName, E.FirstName,datepart(Month,E.BirthDate) as Mes,datepart(day,E.BirthDate) as Dia from Employees as E
+inner join Orders as O on E.EmployeeID=O.EmployeeID
+inner join Customers as C on O.CustomerID=C.CustomerID
+where C.Country!='France'
+go
 
 --Total de ventas en US$ de productos de cada categoría (nombre de la categoría).
-
+Select C.CategoryName,sum((OD.UnitPrice-(OD.UnitPrice*OD.Discount))*OD.Quantity) as [Total de ventas] from Products as P
+inner join [Order Details] as OD on P.ProductID=OD.ProductID
+inner join Categories as C on P.CategoryID=C.CategoryID
+group by C.CategoryName
 
 --Total de ventas en US$ de cada empleado cada año (nombre, apellidos, dirección).
 
