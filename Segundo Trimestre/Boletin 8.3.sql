@@ -35,6 +35,10 @@ inner join Production.Product as P on PS.ProductSubcategoryID=P.ProductSubcatego
 group by PC.[Name]
 
 --6.Igual a la anterior, pero considerando las categorías generales (categorías de categorías).
+select count(P.ProductID) as [Número de productos],PC.[Name] from Production.Product as P
+inner join Production.ProductSubcategory as PS on P.ProductSubcategoryID=PS.ProductSubcategoryID/*Duda*/
+inner join Production.ProductCategory as PC on PS.ProductCategoryID=PC.ProductCategoryID
+group by PC.[Name]
 
 --7.Número de unidades vendidas de cada producto cada año.
 select count(SOH.SalesOrderID) as [Número de unidades vendidas de cada producto cada año],SOD.ProductID,year(SOH.OrderDate) as [Año] from Sales.SalesOrderHeader as SOH
