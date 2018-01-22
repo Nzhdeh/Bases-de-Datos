@@ -19,7 +19,7 @@ inner join Categories as C on P.CategoryID=P.CategoryID
 group by C.CategoryName
 go
 --Nombre de la compañía de todos los clientes que hayan comprado queso de cabrales o tofu.
-select C.CompanyName,/*P.ProductName*/ from Customers as C
+select C.CompanyName/*,P.ProductName*/ from Customers as C
 inner join Orders as O on C.CustomerID=O.CustomerID
 inner join [Order Details] as OD on O.OrderID=OD.OrderID
 inner join Products as P on OD.ProductID=P.ProductID
@@ -51,7 +51,10 @@ inner join Categories as C on P.CategoryID=C.CategoryID
 group by C.CategoryName
 
 --Total de ventas en US$ de cada empleado cada año (nombre, apellidos, dirección).
-
+select sum((OD.UnitPrice-(OD.UnitPrice*OD.Discount))*OD.Quantity) as [Total de ventas de cada empleado],E.LastName, E.FirstName,E.[Address] from Employees as E
+inner join Orders as O on E.EmployeeID=O.EmployeeID
+inner join [Order Details] as OD on O.OrderID=OD.OrderID
+group by E.LastName,E.FirstName,E.[Address]
 
 --Ventas de cada producto en el año 97. Nombre del producto y unidades.
 
