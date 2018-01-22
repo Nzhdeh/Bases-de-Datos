@@ -62,6 +62,7 @@ go
 --Consultas avanzadas
 
 --10.Facturación total en cada país
+select TerritoryID,TotalDue from Sales.SalesOrderHeader
 
 --11.Facturación total en cada Estado
 
