@@ -77,5 +77,5 @@ go
 --dia de la semana de una fecha se usa la función DATEPART (WeekDay, fecha) que devuelve un entero entre 1 y 7 donde el 1 
 --corresponde al lunes, el dos al martes y así sucesivamente.
 --NOTA: El servidor se puede configurar para que la semana empiece en lunes o domingo.
-select Mascota from BI_Visitas
+select Mascota/*,datepart(weekday,Fecha) as [Dia de la semana]*/ from BI_Visitas
 where datepart(weekday,Fecha)=1 or datepart(weekday,Fecha)=5
