@@ -2,30 +2,30 @@
 use Northwind
 go
 
---Nombre de los proveedores y número de productos que nos vende cada uno
+--1. Nombre de los proveedores y número de productos que nos vende cada uno
 select S.CompanyName,count(P.ProductID) as [Número de productos vendidos por los proveedores] from Suppliers as S
 inner join Products as P on S.SupplierID=P.SupplierID
 group by S.CompanyName
 go
 
---Nombre completo y telefono de los vendedores que trabajen en New York, Seattle, Vermont, Columbia, Los Angeles, Redmond o Atlanta.
+--2. Nombre completo y telefono de los vendedores que trabajen en New York, Seattle, Vermont, Columbia, Los Angeles, Redmond o Atlanta.
 --select * from Suppliers
 select LastName,FirstName ,HomePhone,City from Employees
 where City in ('New York','Seattle','Vermont','Columbia','Los Angeles','Redmond','Atlanta')
 go
---Número de productos de cada categoría y nombre de la categoría.
+--3. Número de productos de cada categoría y nombre de la categoría.
 select count(P.ProductID) as [Número de productos de cada categoría],C.CategoryName from Products as P
 inner join Categories as C on P.CategoryID=P.CategoryID
 group by C.CategoryName
 go
---Nombre de la compañía de todos los clientes que hayan comprado queso de cabrales o tofu.
+--4. Nombre de la compañía de todos los clientes que hayan comprado queso de cabrales o tofu.
 select C.CompanyName/*,P.ProductName*/ from Customers as C
 inner join Orders as O on C.CustomerID=O.CustomerID
 inner join [Order Details] as OD on O.OrderID=OD.OrderID
 inner join Products as P on OD.ProductID=P.ProductID
 where P.ProductName in('queso de cabrales','tofu')
 go
---Empleados (ID, nombre, apellidos y teléfono) que han vendido algo a Bon app' o Meter Franken.
+--5. Empleados (ID, nombre, apellidos y teléfono) que han vendido algo a Bon app' o Meter Franken.
 --select * from Employees
 --select ShipName from Orders
 
@@ -35,7 +35,7 @@ inner join Customers as C on O.CustomerID=C.CustomerID
 where CompanyName in('Bon app''','Meter Franken')
 go
 
---Empleados (ID, nombre, apellidos, mes y día de su cumpleaños) que no han vendido nunca nada a ningún cliente de Francia. *
+--6. Empleados (ID, nombre, apellidos, mes y día de su cumpleaños) que no han vendido nunca nada a ningún cliente de Francia. *
 --select * from Employees
 
 select E.EmployeeID, E.LastName, E.FirstName,datepart(Month,E.BirthDate) as Mes,datepart(day,E.BirthDate) as Dia from Employees as E
@@ -44,25 +44,29 @@ inner join Customers as C on O.CustomerID=C.CustomerID
 where C.Country!='France'
 go
 
---Total de ventas en US$ de productos de cada categoría (nombre de la categoría).
+--7. Total de ventas en US$ de productos de cada categoría (nombre de la categoría).
 Select C.CategoryName,sum((OD.UnitPrice-(OD.UnitPrice*OD.Discount))*OD.Quantity) as [Total de ventas] from Products as P
 inner join [Order Details] as OD on P.ProductID=OD.ProductID
 inner join Categories as C on P.CategoryID=C.CategoryID
 group by C.CategoryName
 
---Total de ventas en US$ de cada empleado cada año (nombre, apellidos, dirección).
+--8. Total de ventas en US$ de cada empleado cada año (nombre, apellidos, dirección).
 select sum((OD.UnitPrice-(OD.UnitPrice*OD.Discount))*OD.Quantity) as [Total de ventas de cada empleado],E.LastName, E.FirstName,E.[Address] from Employees as E
 inner join Orders as O on E.EmployeeID=O.EmployeeID
 inner join [Order Details] as OD on O.OrderID=OD.OrderID
 group by E.LastName,E.FirstName,E.[Address]
 
---Ventas de cada producto en el año 97. Nombre del producto y unidades.
+--9. Ventas de cada producto en el año 97. Nombre del producto y unidades.
+select sum((OD.UnitPrice-(OD.UnitPrice*OD.Discount))*OD.Quantity) as [Ventas de cada producto],P.ProductName,P.UnitsOnOrder from Orders as O
+inner join [Order Details] as OD on O.OrderID=OD.OrderID
+inner join Products as P on OD.ProductID=P.ProductID/**********************************************/
+Where ShippedDate=year(1997)
+group by P.ProductName,P.UnitsOnOrder
+
+--10. Cuál es el producto del que hemos vendido más unidades en cada país. *
 
 
---Cuál es el producto del que hemos vendido más unidades en cada país. *
+--11. Empleados (nombre y apellidos) que trabajan a las órdenes de Andrew Fuller.
 
 
---Empleados (nombre y apellidos) que trabajan a las órdenes de Andrew Fuller.
-
-
---Número de subordinados que tiene cada empleado, incluyendo los que no tienen ninguno. Nombre, apellidos, ID.
+--12. Número de subordinados que tiene cada empleado, incluyendo los que no tienen ninguno. Nombre, apellidos, ID.
