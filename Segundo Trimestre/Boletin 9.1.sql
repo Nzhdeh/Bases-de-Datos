@@ -62,11 +62,21 @@ inner join [Order Details] as OD on O.OrderID=OD.OrderID
 inner join Products as P on OD.ProductID=P.ProductID/**********************************************/
 Where ShippedDate=year(1997)
 group by P.ProductName,P.UnitsOnOrder
-
+go
 --10. Cuál es el producto del que hemos vendido más unidades en cada país. *
-
-
+select P.ProductName,C.Country,sum(OD.Quantity) as [Cantidad de unidades vendidas] from Products as P
+inner join [Order Details] as OD on P.ProductID=OD.ProductID
+inner join Orders as O on OD.OrderID=O.OrderID
+inner join Customers as C on O.CustomerID=C.CustomerID--hay que hacerlo con subconsultas
+group by P.ProductName,C.Country
+order by [Cantidad de unidades vendidas] desc
+go
 --11. Empleados (nombre y apellidos) que trabajan a las órdenes de Andrew Fuller.
-
+select E.FirstName,E.LastName from Employees as E
+inner join Employees as Boss on E.ReportsTo=Boss.EmployeeID
+where Boss.FirstName='Andrew' and Boss.LastName='Fuller'
 
 --12. Número de subordinados que tiene cada empleado, incluyendo los que no tienen ninguno. Nombre, apellidos, ID.
+select Esclavo.EmployeeID,Esclavo.FirstName,Esclavo.LastName,count(*) as [Numero de subordinados] from Employees as E
+inner join Employees as Esclavo on E.ReportsTo=Esclavo.EmployeeID
+group by Esclavo.EmployeeID,Esclavo.FirstName,Esclavo.LastName
