@@ -38,10 +38,11 @@ go
 --6. Empleados (ID, nombre, apellidos, mes y día de su cumpleaños) que no han vendido nunca nada a ningún cliente de Francia. *
 --select * from Employees
 
-select E.EmployeeID, E.LastName, E.FirstName,datepart(Month,E.BirthDate) as Mes,datepart(day,E.BirthDate) as Dia from Employees as E
+select distinct E.EmployeeID, E.LastName, E.FirstName,datepart(Month,E.BirthDate) as Mes,datepart(day,E.BirthDate) as Dia from Employees as E
 inner join Orders as O on E.EmployeeID=O.EmployeeID
-inner join Customers as C on O.CustomerID=C.CustomerID
+inner join Customers as C on O.CustomerID=C.CustomerID/***************************/
 where C.Country!='France'
+order by e.EmployeeID
 go
 
 --7. Total de ventas en US$ de productos de cada categoría (nombre de la categoría).
