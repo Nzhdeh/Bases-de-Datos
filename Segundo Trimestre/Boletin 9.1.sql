@@ -29,7 +29,7 @@ go
 --select * from Employees
 --select ShipName from Orders
 
-Select E.EmployeeID, E.LastName, E.FirstName, E.HomePhone from Employees as E
+select E.EmployeeID, E.LastName, E.FirstName, E.HomePhone from Employees as E
 inner join Orders as O on E.EmployeeID=O.EmployeeID
 inner join Customers as C on O.CustomerID=C.CustomerID
 where CompanyName in('Bon app''','Meter Franken')
@@ -37,16 +37,17 @@ go
 
 --6. Empleados (ID, nombre, apellidos, mes y día de su cumpleaños) que no han vendido nunca nada a ningún cliente de Francia. *
 --select * from Employees
-
-select distinct E.EmployeeID, E.LastName, E.FirstName,datepart(Month,E.BirthDate) as Mes,datepart(day,E.BirthDate) as Dia from Employees as E
+select E.EmployeeID, E.LastName, E.FirstName,datepart(Month,E.BirthDate) as Mes,datepart(day,E.BirthDate) as Dia from Employees as E
+except
+select E.EmployeeID, E.LastName, E.FirstName,datepart(Month,E.BirthDate) as Mes,datepart(day,E.BirthDate) as Dia from Employees as E
 inner join Orders as O on E.EmployeeID=O.EmployeeID
-inner join Customers as C on O.CustomerID=C.CustomerID/***************************/
-where C.Country!='France'
-order by e.EmployeeID
+inner join Customers as C on O.CustomerID=C.CustomerID /***************************/
+where C.Country = 'France'
+order by E.EmployeeID
 go
 
 --7. Total de ventas en US$ de productos de cada categoría (nombre de la categoría).
-Select C.CategoryName,sum((OD.UnitPrice-(OD.UnitPrice*OD.Discount))*OD.Quantity) as [Total de ventas] from Products as P
+select C.CategoryName,sum((OD.UnitPrice-(OD.UnitPrice*OD.Discount))*OD.Quantity) as [Total de ventas] from Products as P
 inner join [Order Details] as OD on P.ProductID=OD.ProductID
 inner join Categories as C on P.CategoryID=C.CategoryID
 group by C.CategoryName
@@ -61,7 +62,7 @@ group by E.LastName,E.FirstName,E.[Address]
 select sum((OD.UnitPrice-(OD.UnitPrice*OD.Discount))*OD.Quantity) as [Ventas de cada producto],P.ProductName,P.UnitsOnOrder from Orders as O
 inner join [Order Details] as OD on O.OrderID=OD.OrderID
 inner join Products as P on OD.ProductID=P.ProductID/**********************************************/
-Where ShippedDate=year(1997)
+where ShippedDate=year(1997)
 group by P.ProductName,P.UnitsOnOrder
 go
 --10. Cuál es el producto del que hemos vendido más unidades en cada país. *
