@@ -50,6 +50,10 @@ select ShipVia,count(OrderID) as [Numero de pedidos enviados] from Orders
 group by ShipVia
 go
 --10. ID de cada proveedor y número de productos distintos que nos suministra.
-select SupplierID,count(ProductID) as [Numero de productos distintos suministrados] from Products--se puede poner distinct
+--select SupplierID,count(ProductID) as [Numero de productos distintos suministrados] from Products--se puede poner distinct
+--group by SupplierID
+--go
+
+select SupplierID,count(*) as [Numero de productos distintos suministrados] from Products--se puede poner distinct
 group by SupplierID
 go
