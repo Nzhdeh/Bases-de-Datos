@@ -44,7 +44,7 @@ inner join Orders as O on E.EmployeeID=O.EmployeeID
 inner join [Order Details] as OD on O.OrderID=OD.OrderID
 inner join Products as P on OD.ProductID=P.ProductID
 where P.ProductName in ('Chartreuse verte','Ravioli Angelo')
-
+go
 --6. Número de unidades de cada categoría de producto que ha vendido cada empleado.
 select E.LastName,E.FirstName,C.CategoryName,count(*) as [Número de unidades de cada categoría] from Employees as E
 inner join Orders as O on E.EmployeeID=O.EmployeeID
@@ -53,7 +53,7 @@ inner join Products as P on OD.ProductID=P.ProductID
 inner join Categories as C on P.CategoryID=C.CategoryID
 group by C.CategoryName,E.LastName,E.FirstName
 order by E.LastName,E.FirstName
-
+go
 --7. Total de ventas (US$) de cada categoría en el año 97.
 select C.CategoryName,sum(OD.Quantity*(OD.UnitPrice*(1-OD.Discount))) as [Total de ventas de cada categoría] from Orders as O
 inner join [Order Details] as OD on O.OrderID=OD.OrderID 
@@ -61,18 +61,30 @@ inner join Products as P on OD.ProductID=P.ProductID
 inner join Categories as C on P.CategoryID=C.CategoryID
 group by C.CategoryName,year(O.OrderDate)
 having year(O.OrderDate)=1997
-
+go
 --8. Productos que han comprado más de un cliente del mismo país, indicando el
 --nombre del producto, el país y el número de clientes distintos de ese país que
 --lo han comprado.
-
-
+select P.ProductID,C.Country,count (distinct C.CustomerID) as [Clientes] from Products as P
+inner join [Order Details] as OD on P.ProductID=OD.ProductID
+inner join Orders as O on OD.OrderID=O.OrderID
+inner join Customers as C on O.CustomerID=C.CustomerID
+group by P.ProductID,C.Country
+having count(distinct C.CustomerID)>1
+go
 --9. Total de ventas (US$) en cada país cada año.
-
+select sum(OD.Quantity*(OD.UnitPrice*(1-OD.Discount))) as [Total de ventas],O.ShipCountry,year(O.OrderDate) as [Año] from [Order Details] as OD
+inner join Orders as O on OD.OrderID=O.OrderID
+group by O.ShipCountry,year(O.OrderDate)
+order by year(O.OrderDate)
 
 --10. Producto superventas de cada año, indicando año, nombre del producto,
 --categoría y cifra total de ventas.
-
+select year(O.OrderDate) as [Año],P.ProductName,C.CategoryName,sum(OD.Quantity) as [Top ventas] from Orders as O
+inner join [Order Details] as OD on O.OrderID=OD.OrderID
+inner join Products as P on OD.ProductID=P.ProductID
+inner join Categories as C on P.CategoryID=C.CategoryID
+group by year(O.OrderDate),P.ProductName,C.CategoryName/******************************************/
 
 --11. Cifra de ventas de cada producto en el año 97 y su aumento o disminución
 --respecto al año anterior en US $ y en %.
