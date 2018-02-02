@@ -80,11 +80,11 @@ order by year(O.OrderDate)
 
 --10. Producto superventas de cada año, indicando año, nombre del producto,
 --categoría y cifra total de ventas.
-select year(O.OrderDate) as [Año],P.ProductName,C.CategoryName,sum(OD.Quantity) as [Top ventas] from Orders as O
+select year(O.OrderDate) as [Año],P.ProductName,C.CategoryName,sum(OD.Quantity) as [Unidades vendidas] from Orders as O
 inner join [Order Details] as OD on O.OrderID=OD.OrderID
 inner join Products as P on OD.ProductID=P.ProductID
 inner join Categories as C on P.CategoryID=C.CategoryID
-group by year(O.OrderDate),P.ProductName,C.CategoryName/******************************************/
+group by year(O.OrderDate),P.ProductName,C.CategoryName
 
 --11. Cifra de ventas de cada producto en el año 97 y su aumento o disminución
 --respecto al año anterior en US $ y en %.
