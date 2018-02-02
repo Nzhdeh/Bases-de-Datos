@@ -53,26 +53,32 @@ inner join Categories as C on P.CategoryID=C.CategoryID
 group by C.CategoryName
 
 --8. Total de ventas en US$ de cada empleado cada año (nombre, apellidos, dirección).
-select sum((OD.UnitPrice-(OD.UnitPrice*OD.Discount))*OD.Quantity) as [Total de ventas de cada empleado],E.LastName, E.FirstName,E.[Address] from Employees as E
+select sum((OD.UnitPrice-(OD.UnitPrice*OD.Discount))*OD.Quantity) as [Total de ventas de cada empleado],E.LastName, E.FirstName,E.[Address],year(O.OrderDate) as [Año] from Employees as E
 inner join Orders as O on E.EmployeeID=O.EmployeeID
 inner join [Order Details] as OD on O.OrderID=OD.OrderID
-group by E.LastName,E.FirstName,E.[Address]
+group by E.LastName,E.FirstName,E.[Address],year(O.OrderDate)
+order by year(O.OrderDate)
 
 --9. Ventas de cada producto en el año 97. Nombre del producto y unidades.
 select sum((OD.UnitPrice-(OD.UnitPrice*OD.Discount))*OD.Quantity) as [Ventas de cada producto],P.ProductName,P.UnitsOnOrder from Orders as O
 inner join [Order Details] as OD on O.OrderID=OD.OrderID
-inner join Products as P on OD.ProductID=P.ProductID/**********************************************/
+inner join Products as P on OD.ProductID=P.ProductID
 where ShippedDate=year(1997)
 group by P.ProductName,P.UnitsOnOrder
 go
 --10. Cuál es el producto del que hemos vendido más unidades en cada país. *
-select P.ProductName,C.Country,sum(OD.Quantity) as [Cantidad de unidades vendidas] from Products as P
+select P.ProductName,C.Country,max(OD.Quantity) as [Cantidad maxima] from Products as P
 inner join [Order Details] as OD on P.ProductID=OD.ProductID
 inner join Orders as O on OD.OrderID=O.OrderID
-inner join Customers as C on O.CustomerID=C.CustomerID--hay que hacerlo con subconsultas
-group by P.ProductName,C.Country
-order by [Cantidad de unidades vendidas] desc
+inner join Customers as C on O.CustomerID=C.CustomerID
+where OD.Quantity in
+		(select P.ProductName,C.Country,sum(OD.Quantity) as [Cantidad de unidades vendidas] from Products as P
+		inner join [Order Details] as OD on P.ProductID=OD.ProductID
+		inner join Orders as O on OD.OrderID=O.OrderID
+		inner join Customers as C on O.CustomerID=C.CustomerID
+		group by P.ProductName,C.Country)
 go
+
 --11. Empleados (nombre y apellidos) que trabajan a las órdenes de Andrew Fuller.
 select E.FirstName,E.LastName from Employees as E
 inner join Employees as Boss on E.ReportsTo=Boss.EmployeeID
