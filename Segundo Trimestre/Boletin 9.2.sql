@@ -80,11 +80,26 @@ order by year(O.OrderDate)
 
 --10. Producto superventas de cada año, indicando año, nombre del producto,
 --categoría y cifra total de ventas.
-select year(O.OrderDate) as [Año],P.ProductName,C.CategoryName,sum(OD.Quantity) as [Unidades vendidas] from Orders as O
-inner join [Order Details] as OD on O.OrderID=OD.OrderID
-inner join Products as P on OD.ProductID=P.ProductID
-inner join Categories as C on P.CategoryID=C.CategoryID
-group by year(O.OrderDate),P.ProductName,C.CategoryName
+select year(O.OrderDate) as Año,P.ProductName,C.CategoryName,sum(OD.Quantity) as [Unidades Vendidas Top Ventas] from Categories AS C
+INNER JOIN Products as P on C.CategoryID=P.CategoryID
+INNER JOIN [Order Details] as OD on P.ProductID=OD.ProductID
+INNER JOIN Orders as O on OD.OrderID=O.OrderID
+INNER JOIN(
+select [Unidades Vendidas por año y producto].Año,max([Unidades Vendidas por año y producto].[Unidades Vendidas]) as [Más vendido] from Products as P
+INNER JOIN [Order Details] as OD on P.ProductID=OD.ProductID
+INNER JOIN Orders as O on OD.OrderID=O.OrderID
+INNER JOIN(
+	select P.ProductID,P.ProductName,C.CategoryID, year(O.OrderDate) as Año,sum(OD.Quantity) as [Unidades Vendidas] from Products as P
+	INNER JOIN Categories as C on P.CategoryID=C.CategoryID
+	INNER JOIN [Order Details] as OD on P.ProductID=OD.ProductID
+	INNER JOIN Orders as O on OD.OrderID=O.OrderID
+	group by P.ProductID,P.ProductName,C.CategoryID, year(O.OrderDate)
+	) as [Unidades Vendidas por año y producto] on [Unidades Vendidas por año y producto].ProductID=P.ProductID
+group by [Unidades Vendidas por año y producto].Año
+) as UDSDELTOPVENTAS on UDSDELTOPVENTAS.Año=year(O.OrderDate)
+group by P.ProductName,C.CategoryName,year(O.OrderDate),UDSDELTOPVENTAS.[Más vendido]
+having sum(OD.Quantity)=UDSDELTOPVENTAS.[Más vendido]
+Order by Año
 
 --11. Cifra de ventas de cada producto en el año 97 y su aumento o disminución
 --respecto al año anterior en US $ y en %.
@@ -94,10 +109,15 @@ group by year(O.OrderDate),P.ProductName,C.CategoryName
 
 
 --13. Número de productos diferentes que nos compra cada cliente.
-
+select O.CustomerID,count(distinct OD.ProductID) as [Numero de productos diferentes] from [Order Details] as OD
+inner join Orders as O on OD.OrderID=O.OrderID
+group by O.CustomerID
 
 --14. Clientes que nos compran más de cinco productos diferentes.
-
+select distinct O.CustomerID from Orders as O
+inner join [Order Details] as OD on O.OrderID=OD.OrderID
+group by O.CustomerID
+having count (distinct OD.ProductID)>5
 
 --15. Vendedores que han vendido una mayor cantidad que la media en US $ en el año 97.
 
