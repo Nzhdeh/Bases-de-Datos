@@ -103,6 +103,19 @@ Order by Año
 
 --11. Cifra de ventas de cada producto en el año 97 y su aumento o disminución
 --respecto al año anterior en US $ y en %.
+select P.ProductID,P.ProductName, sum(OD.Quantity*(OD.UnitPrice*(1-OD.Discount))) as [Cifra de ventas de cada producto],(SUM(OD.Quantity*(OD.UnitPrice*(1-OD.Discount)))-[Cifra de ventas del 96]) AS [Aumento/Disminucion],(((SUM(OD.Quantity*(OD.UnitPrice*(1-OD.Discount)))/[Cifra de ventas del 96])-1)*100) AS [Porcentaje crecimiento de ventas] from Orders as O
+inner join [Order Details] as OD on O.OrderID=OD.OrderID
+inner join Products as P on OD.ProductID=P.ProductID
+inner join (
+			select P.ProductID,P.ProductName, sum(OD.Quantity*(OD.UnitPrice*(1-OD.Discount))) as [Cifra de ventas del 96] from Orders as O
+			inner join [Order Details] as OD on O.OrderID=OD.OrderID
+			inner join Products as P on OD.ProductID=P.ProductID
+			where year(O.OrderDate)=1996
+			group by P.ProductName,P.ProductID
+)AS [Ventas 1996] ON P.ProductID=[Ventas 1996].ProductID
+where year(O.OrderDate)=1997
+group by P.ProductName,P.ProductID,[Cifra de ventas del 96]
+order by P.ProductID
 
 
 --12. Mejor cliente (el que más nos compra) de cada país.
