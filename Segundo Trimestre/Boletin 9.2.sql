@@ -72,11 +72,13 @@ inner join Customers as C on O.CustomerID=C.CustomerID
 group by P.ProductID,C.Country
 having count(distinct C.CustomerID)>1
 go
+
 --9. Total de ventas (US$) en cada país cada año.
 select sum(OD.Quantity*(OD.UnitPrice*(1-OD.Discount))) as [Total de ventas],O.ShipCountry,year(O.OrderDate) as [Año] from [Order Details] as OD
 inner join Orders as O on OD.OrderID=O.OrderID
 group by O.ShipCountry,year(O.OrderDate)
 order by year(O.OrderDate)
+go
 
 --10. Producto superventas de cada año, indicando año, nombre del producto,
 --categoría y cifra total de ventas.
@@ -100,6 +102,7 @@ group by [Unidades Vendidas por año y producto].Año
 group by P.ProductName,C.CategoryName,year(O.OrderDate),UDSDELTOPVENTAS.[Más vendido]
 having sum(OD.Quantity)=UDSDELTOPVENTAS.[Más vendido]
 Order by Año
+go
 
 --11. Cifra de ventas de cada producto en el año 97 y su aumento o disminución
 --respecto al año anterior en US $ y en %.
@@ -116,24 +119,56 @@ inner join (
 where year(O.OrderDate)=1997
 group by P.ProductName,P.ProductID,[Cifra de ventas del 96]
 order by P.ProductID
-
+go
 
 --12. Mejor cliente (el que más nos compra) de cada país.
-
+select C.CustomerID,C.CompanyName,C.Country,[Compras del Mejor Cliente] from Customers as C
+inner join Orders as O on C.CustomerID=O.CustomerID
+inner join
+	(select  [Veces comprados].Country,max([Veces comprados].[Cantidad de compras]) as [Compras del Mejor Cliente] from Customers as C
+	inner join Orders as O on C.CustomerID=O.CustomerID
+	inner join
+			(select C.CustomerID,C.CompanyName, C.Country,count(O.OrderID) as [Cantidad de compras] from Customers as C
+			inner join Orders as O on C.CustomerID=O.CustomerID
+			group by  C.CustomerID,C.CompanyName, C.Country) as [Veces comprados] on C.CustomerID=[Veces comprados].CustomerID
+	group by [Veces comprados].Country) as [Mejor Cliente] on C.Country=[Mejor Cliente].Country
+group by C.CustomerID,C.CompanyName,C.Country,[Compras del Mejor Cliente]
+having count(O.CustomerID)=[Mejor Cliente].[Compras del Mejor Cliente]
+go
 
 --13. Número de productos diferentes que nos compra cada cliente.
 select O.CustomerID,count(distinct OD.ProductID) as [Numero de productos diferentes] from [Order Details] as OD
 inner join Orders as O on OD.OrderID=O.OrderID
 group by O.CustomerID
+go
 
 --14. Clientes que nos compran más de cinco productos diferentes.
-select distinct O.CustomerID from Orders as O
+select O.CustomerID,count (distinct OD.ProductID) as [Cantidad de productros comprados] from Orders as O
 inner join [Order Details] as OD on O.OrderID=OD.OrderID
 group by O.CustomerID
-having count (distinct OD.ProductID)>5
+having count (/*distinct*/ OD.ProductID)>5
+order by O.CustomerID
+go
 
 --15. Vendedores que han vendido una mayor cantidad que la media en US $ en el año 97.
-
+select E.EmployeeID,E.FirstName,E.LastName,sum(OD.Quantity*(OD.UnitPrice*(1-OD.Discount))) as [Mejor venta] from Employees as E
+inner join Orders as O on E.EmployeeID=O.EmployeeID
+inner join [Order Details] as OD on O.OrderID=OD.OrderID
+where year(O.OrderDate)=1997
+GROUP BY E.EmployeeID,E.FirstName,E.LastName
+having (sum(OD.Quantity*(OD.UnitPrice*(1-OD.Discount))))>
+(
+	select avg([Ventas en el 97].[Total Ventas]) as [Media] from
+		(
+			select E.EmployeeID,sum(OD.Quantity*(OD.UnitPrice*(1-OD.Discount))) as [Total Ventas] from Employees as E
+			inner join Orders as O on E.EmployeeID=O.EmployeeID
+			inner join [Order Details] as OD on O.OrderID=OD.OrderID
+			where year(O.OrderDate)=1997
+			group by E.EmployeeID
+		)as [Ventas en el 97]
+)
+order by E.EmployeeID
+go
 
 --16. Empleados que hayan aumentado su cifra de ventas más de un 10% entre dos
 --años consecutivos, indicando el año en que se produjo el aumento.
