@@ -55,8 +55,19 @@ go
 
 --8. Empleados que hayan trabajado en alguna editorial que haya publicado algún libro en el que alguno de 
 --los autores fuera Marjorie Green o Michael O'Leary.
+select E.fname,E.lname,A.au_fname,A.au_lname from employee as E
+inner join publishers as P on E.pub_id=P.pub_id
+inner join titles as T on P.pub_id=T.pub_id
+inner join titleauthor as TA on T.title_id=TA.title_id
+inner join authors as A on TA.au_id=A.au_id
+where A.au_fname in ('Marjorie','Michael') and A.au_lname in('Green','O''Leary')
+go
 
 --9. Número de ejemplares vendidos de cada libro, especificando el título y el tipo.
+select T.title,T.[type],count(S.title_id) as [Ejemplares vendidos] from titles as T
+inner join sales as S on T.title_id=S.title_id
+group by T.title,T.[type]
+go
 
 --10.  Número de ejemplares de todos sus libros que ha vendido cada autor.
 
