@@ -31,12 +31,13 @@ where P.ProductName in ('Gudbrandsdalsost','Lakkalikööri','Tourtière','Boston Cr
 go
 --5. Empleados que no han vendido nunca “Chartreuse verte” ni “Ravioli Angelo”.
 select distinct E.EmployeeID,E.FirstName,E.LastName from Employees as E
-inner join Orders as O on E.EmployeeID=O.EmployeeID
-inner join [Order Details] as OD on O.OrderID=OD.OrderID			--preguntar a Leo
+where E.EmployeeID not in 
+(select distinct O.EmployeeID from Orders as O 
+inner join [Order Details] as OD on O.OrderID=OD.OrderID
 inner join Products as P on OD.ProductID=P.ProductID
-where P.ProductName not in ('Chartreuse verte','Ravioli Angelo')
-go
+where P.ProductName in ('Chartreuse verte','Ravioli Angelo'))
 
+--segunda solucion
 select distinct E.EmployeeID,E.FirstName,E.LastName from Employees as E
 except
 select distinct E.EmployeeID,E.FirstName,E.LastName from Employees as E
