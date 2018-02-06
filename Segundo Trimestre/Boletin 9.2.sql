@@ -99,9 +99,9 @@ INNER JOIN(
 	group by P.ProductID,P.ProductName,C.CategoryID, year(O.OrderDate)
 	) as [Unidades Vendidas por año y producto] on [Unidades Vendidas por año y producto].ProductID=P.ProductID
 group by [Unidades Vendidas por año y producto].Año
-) as UDSDELTOPVENTAS on UDSDELTOPVENTAS.Año=year(O.OrderDate)
-group by P.ProductName,C.CategoryName,year(O.OrderDate),UDSDELTOPVENTAS.[Más vendido]
-having sum(OD.Quantity)=UDSDELTOPVENTAS.[Más vendido]
+) as UnidadesDelTopVentas on UnidadesDelTopVentas.Año=year(O.OrderDate)
+group by P.ProductName,C.CategoryName,year(O.OrderDate),UnidadesDelTopVentas.[Más vendido]
+having sum(OD.Quantity)=UnidadesDelTopVentas.[Más vendido]
 Order by Año
 go
 
