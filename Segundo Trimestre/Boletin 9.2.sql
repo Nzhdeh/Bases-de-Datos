@@ -60,8 +60,9 @@ select C.CategoryName,sum(OD.Quantity*(OD.UnitPrice*(1-OD.Discount))) as [Total 
 inner join [Order Details] as OD on O.OrderID=OD.OrderID 
 inner join Products as P on OD.ProductID=P.ProductID
 inner join Categories as C on P.CategoryID=C.CategoryID
+where year(O.OrderDate)=1997
 group by C.CategoryName,year(O.OrderDate)
-having year(O.OrderDate)=1997
+--having year(O.OrderDate)=1997
 go
 --8. Productos que han comprado más de un cliente del mismo país, indicando el
 --nombre del producto, el país y el número de clientes distintos de ese país que
