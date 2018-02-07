@@ -106,11 +106,13 @@ go
 
 --14.  Empleados que no trabajan actualmente en editoriales que han publicado libros cuya columna notes 
 --contenga la palabra "and”
-select P.pub_id,T.title_id,T.notes from titles as T
-inner join publishers as P on T.pub_id=P.pub_id/***********************************/
+select E.emp_id,E.fname,E.lname from employee as E
+except
+select E.emp_id,E.fname,E.lname from titles as T
+inner join publishers as P on T.pub_id=P.pub_id
+inner join employee as E on P.pub_id=E.pub_id
 where T.notes like '%and%'
 go
-
 
 select * from authors
 --prueba
