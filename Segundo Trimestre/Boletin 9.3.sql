@@ -86,7 +86,7 @@ go
 
 --12.  Número de empleados de cada categoría (jobs) que tiene cada editorial, incluyendo aquellas categorías 
 --en las que no haya ningún empleado.
-select J.job_desc,E.pub_id,count(*) [Número de empleados de cada categoría] from employee as E
+select J.job_desc,E.pub_id,count(E.emp_id) [Número de empleados de cada categoría] from employee as E
 right join jobs as J on E.job_id=J.job_id
 group by J.job_desc,E.pub_id
 order by J.job_desc
