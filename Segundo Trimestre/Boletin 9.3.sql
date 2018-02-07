@@ -70,16 +70,47 @@ group by T.title,T.[type]
 go
 
 --10.  Número de ejemplares de todos sus libros que ha vendido cada autor.
+select TA.au_id,count (*) as [Numero de ejemplares vendidos por autor] from titleauthor as TA
+inner join titles as T on TA.title_id=T.title_id
+inner join sales as S on T.title_id=S.title_id
+group by TA.au_id
+order by TA.au_id
+go
 
 --11.  Número de empleados de cada categoría (jobs).
+select J.job_desc,count(*) [Número de empleados de cada categoría] from employee as E
+inner join jobs as J on E.job_id=J.job_id
+group by J.job_desc
+order by J.job_desc
+go
 
 --12.  Número de empleados de cada categoría (jobs) que tiene cada editorial, incluyendo aquellas categorías 
 --en las que no haya ningún empleado.
+select J.job_desc,E.pub_id,count(*) [Número de empleados de cada categoría] from employee as E
+right join jobs as J on E.job_id=J.job_id
+group by J.job_desc,E.pub_id
+order by J.job_desc
+go
 
 --13.  Autores que han escrito libros de dos o más tipos diferentes
+select A.au_id,A.au_fname,A.au_lname,count(T.[type]) as [Dos o mas Tipos] from authors as A
+inner join titleauthor as TA on A.au_id=TA.au_id
+inner join titles as T on TA.title_id=T.title_id
+inner join (select A.au_id, A.au_fname,A.au_lname,count(T.[type]) as [Cantidad de Tipo] from authors as A
+				inner join titleauthor as TA on A.au_id=TA.au_id
+				inner join titles as T on TA.title_id=T.title_id
+				group by A.au_id, A.au_fname,A.au_lname			) as Tipo on A.au_id=Tipo.au_id
+group by A.au_id,A.au_fname,A.au_lname,[Cantidad de Tipo]
+having Tipo.[Cantidad de Tipo]>1
+go
 
 --14.  Empleados que no trabajan actualmente en editoriales que han publicado libros cuya columna notes 
 --contenga la palabra "and”
+select P.pub_id,T.title_id,T.notes from titles as T
+inner join publishers as P on T.pub_id=P.pub_id/***********************************/
+where T.notes like '%and%'
+go
+
 
 select * from authors
 --prueba
