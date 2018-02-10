@@ -60,27 +60,28 @@ go
 --inner join 
 --(
 select MaxEnfermedadComunYEspecie.[Especie],MaxEnfermedadComunYEspecie.[Enfermedad mas comun] as [Top enfermedad],EN.Nombre  from Enfermedades as E
---inner join BI_Mascotas_Enfermedades as ME on E.IDEnfermedad=ME.IDEnfermedad
---inner join BI_Mascotas as M on ME.Mascota=M.Codigo
 inner join
-
 		(
 		select Especie, max([Cantidad de Enfermedades]) [Enfermedad mas comun] from Enfermedades as ENF
 		group by Especie) as MaxEnfermedadComunYEspecie 
 		on E.Especie=MaxEnfermedadComunYEspecie.Especie AND [Enfermedad mas comun]=E.[Cantidad de Enfermedades]
 	inner join BI_Enfermedades AS EN on E.IDEnfermedad = EN.ID
-
-
---		group by MaxEnfermedadComunYEspecie.[Especie]) as TopEnfermedad on TopEnfermedad.[Especie]=M.Especie
---group by E.Nombre,TopEnfermedad.[Top enfermedad] 
---having sum(ME.IDEnfermedad)=TopEnfermedad.[Top enfermedad] 
 go
 --8.Duración media, en días, de cada enfermedad, desde que se detecta hasta que se cura. Incluye solo los casos en que el animal se haya curado. 
 --Se entiende que una mascota se ha curado si tiene fecha de curación y está viva o su fecha de fallecimiento es posterior a la fecha de curación.
 
 --9.Número de veces que ha acudido a consulta cada cliente con alguna de sus mascotas. Incluye nombre y apellidos del cliente.
+select C.Nombre,M.Codigo,count(*) as [Numero de acudidos] from BI_Clientes as C 
+inner join  BI_Mascotas as M on C.Codigo=M.CodigoPropietario
+inner join BI_Visitas as V on M.Codigo=V.Mascota 
+group by C.Nombre,M.Codigo
+go
 
 --10.Número de visitas a las que ha acudido cada mascota, fecha de su primera y de su última visita
+select M.Alias,count(*) as [Numero de veces acudidos],ME.FechaInicio,ME.FechaCura from BI_Mascotas as M
+inner join BI_Mascotas_Enfermedades as ME on M.Codigo =ME.Mascota
+group by M.Alias,ME.FechaInicio,ME.FechaCura
+go
 
 --11.Incremento (o disminución) de peso que ha experimentado cada mascota entre cada dos consultas sucesivas. Incluye nombre de la mascota, especie, 
 --fecha de las dos consultas sucesivas e incremento o disminución de peso.
