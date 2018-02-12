@@ -32,8 +32,15 @@ insert into F_Palos_Cantaor
 --Haz que todos los cantaores que cantaban Bamberas o Peteneras canten Tonás. No utilices los codicos de los palos, sino sus nombres.
 select * from F_Palos_Cantaor
 select * from F_Palos
+
+begin transaction 
+
 update F_Palos_Cantaor
 set
+
+--commit
+rollback
+
 --Ejercicio 3
 --Número de los cantaores mayores de 30 años que han actuado cada año en cada peña. Se contara la edad que tenían en el año de la actuacion
 
