@@ -57,11 +57,11 @@ go
 select MaxEnfermedadComunYEspecie.[Especie],MaxEnfermedadComunYEspecie.[Enfermedad mas comun] as [Top enfermedad],EN.Nombre  from Enfermedades as E
 inner join
 		(
-		select Especie, max([Cantidad de Enfermedades]) [Enfermedad mas comun] from Enfermedades as ENF
-		group by Especie) as MaxEnfermedadComunYEspecie 
-		on E.Especie=MaxEnfermedadComunYEspecie.Especie AND [Enfermedad mas comun]=E.[Cantidad de Enfermedades]
-	inner join BI_Enfermedades AS EN on E.IDEnfermedad = EN.ID
+		select Especie, max([Cantidad de Enfermedades]) as [Enfermedad mas comun] from Enfermedades as ENF
+		group by Especie) as MaxEnfermedadComunYEspecie on E.Especie=MaxEnfermedadComunYEspecie.Especie AND [Enfermedad mas comun]=E.[Cantidad de Enfermedades]
+		inner join BI_Enfermedades AS EN on E.IDEnfermedad = EN.ID
 go
+
 --8.Duración media, en días, de cada enfermedad, desde que se detecta hasta que se cura. Incluye solo los casos en que el animal se haya curado. 
 --Se entiende que una mascota se ha curado si tiene fecha de curación y está viva o su fecha de fallecimiento es posterior a la fecha de curación.
 select M.Codigo,M.Alias,datediff(day,ME.FechaInicio,ME.FechaCura) as [Duracion en dias] from BI_Mascotas_Enfermedades as ME
