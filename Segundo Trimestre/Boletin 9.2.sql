@@ -174,6 +174,13 @@ go
 
 --16. Empleados que hayan aumentado su cifra de ventas más de un 10% entre dos
 --años consecutivos, indicando el año en que se produjo el aumento.
-select E.FirstName,E.FirstName from Employees as E
+select E.EmployeeID,E.FirstName,E.LastName,year(O.OrderDate) as [Año],sum(OD.Quantity*(OD.UnitPrice*(1-OD.Discount))) AS [Ventas] from Employees as E
 inner join Orders as O on E.EmployeeID=O.EmployeeID
-inner join [Order Details] as OD on O.OrderID=OD.OrderID/*************************/
+inner join [Order Details] as OD on O.OrderID=OD.OrderID
+inner join 
+(
+select E.EmployeeID,E.FirstName,E.LastName,year(O.OrderDate) as [Año],sum(OD.Quantity*(OD.UnitPrice*(1-OD.Discount))) AS [Ventas] from Employees as E
+inner join Orders as O on E.EmployeeID=O.EmployeeID
+inner join [Order Details] as OD on O.OrderID=OD.OrderID
+group by E.EmployeeID,E.FirstName,E.LastName,year(O.OrderDate)
+) as [Año consecutivo] on E.EmployeeID=[Año consecutivo].EmployeeID
