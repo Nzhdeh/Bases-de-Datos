@@ -86,10 +86,13 @@ go
 
 --11.Incremento (o disminución) de peso que ha experimentado cada mascota entre cada dos consultas sucesivas. 
 --Incluye nombre de la mascota, especie, fecha de las dos consultas sucesivas e incremento o disminución de peso.
-select M.Alias,M.Especie,V.Fecha from BI_Mascotas as M
-inner join BI_Visitas as V on M.Codigo=V.Mascota
-go
 
-select V.IDVisita,V.Mascota,V.Peso,V.Fecha from BI_Visitas as V
-inner join BI_Visitas as V2 on V.IDVisita=V2.IDVisita
-where V.Fecha=
+
+(select distinct V.IDVisita,V.Mascota,V.Peso,V.Fecha from BI_Visitas as V
+		inner join BI_Visitas as V2 on V.Mascota=V2.Mascota
+		inner join (select V.IDVisita,V.Mascota,V.Peso,V.Fecha from BI_Visitas as V
+					inner join BI_Visitas as V2 on V.Mascota=V2.Mascota
+					where V.Fecha<V2.Fecha
+					) as [Fecha primera visita] on V.Mascota=[Fecha primera visita].Mascota and V.Fecha>[Fecha primera visita].Fecha
+		) as [Fecha de la visita proxima] on V.Mascota=[Fecha de la visita proxima].Mascota
+	
