@@ -54,11 +54,6 @@ inner join BI_Mascotas_Enfermedades as ME on M.Codigo=ME.Mascota
 group by M.Especie,ME.IDEnfermedad
 go
 
---select E.Nombre,sum(ME.IDEnfermedad) as [Enfermedad mas comun] from BI_Enfermedades as E
---inner join BI_Mascotas_Enfermedades as ME on E.ID=ME.IDEnfermedad
---inner join BI_Mascotas as M on ME.Mascota=M.Codigo
---inner join 
---(
 select MaxEnfermedadComunYEspecie.[Especie],MaxEnfermedadComunYEspecie.[Enfermedad mas comun] as [Top enfermedad],EN.Nombre  from Enfermedades as E
 inner join
 		(
@@ -69,7 +64,13 @@ inner join
 go
 --8.Duración media, en días, de cada enfermedad, desde que se detecta hasta que se cura. Incluye solo los casos en que el animal se haya curado. 
 --Se entiende que una mascota se ha curado si tiene fecha de curación y está viva o su fecha de fallecimiento es posterior a la fecha de curación.
+select M.Codigo,M.Alias,datediff(day,ME.FechaInicio,ME.FechaCura) as [Duracion en dias] from BI_Mascotas_Enfermedades as ME
+inner join BI_Mascotas as m on ME.Mascota=M.Codigo
+where ME.FechaCura is not null
+go
 
+--select * from BI_Mascotas_Enfermedades
+--select * from BI_Mascotas
 --9.Número de veces que ha acudido a consulta cada cliente con alguna de sus mascotas. Incluye nombre y apellidos del cliente.
 select C.Nombre,M.Codigo,count(*) as [Numero de acudidos] from BI_Clientes as C 
 inner join  BI_Mascotas as M on C.Codigo=M.CodigoPropietario
@@ -83,5 +84,12 @@ inner join BI_Mascotas_Enfermedades as ME on M.Codigo =ME.Mascota
 group by M.Alias,ME.FechaInicio,ME.FechaCura
 go
 
---11.Incremento (o disminución) de peso que ha experimentado cada mascota entre cada dos consultas sucesivas. Incluye nombre de la mascota, especie, 
---fecha de las dos consultas sucesivas e incremento o disminución de peso.
+--11.Incremento (o disminución) de peso que ha experimentado cada mascota entre cada dos consultas sucesivas. 
+--Incluye nombre de la mascota, especie, fecha de las dos consultas sucesivas e incremento o disminución de peso.
+select M.Alias,M.Especie,V.Fecha from BI_Mascotas as M
+inner join BI_Visitas as V on M.Codigo=V.Mascota
+go
+
+select V.IDVisita,V.Mascota,V.Peso,V.Fecha from BI_Visitas as V
+inner join BI_Visitas as V2 on V.IDVisita=V2.IDVisita
+where V.Fecha=
