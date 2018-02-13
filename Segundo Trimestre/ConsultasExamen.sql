@@ -49,14 +49,15 @@ inner join TMEstablecimientos as E on P.IDEstablecimiento=E.ID
 group by E.Ciudad,R.ID,R.Nombre,R.Apellidos
 
 go
-select R.ID,R.Nombre,R.Apellidos,MaximoReparto.[El mejor repartidor por ciudad] as [Top repartidor] from TodosLosRepartidores as R 
-inner join TMPedidos as P on R.ID=P.IDRepartidor
+select TR.ID,TR.Nombre,TR.Apellidos,TR.Ciudad,MaximoReparto.[El mejor repartidor por ciudad] as [Top repartidor] from TodosLosRepartidores as TR 
+inner join TMPedidos as P on TR.ID=P.IDRepartidor
 inner join
 	(
 	select Ciudad,max([Cantidad de repartos por repartidor]) as [El mejor repartidor por ciudad] from TodosLosRepartidores as TLR
 	group by Ciudad) as MaximoReparto 
-	on R.Ciudad=MaximoReparto.Ciudad  and [El mejor repartidor por ciudad]=R.[Cantidad de repartos por repartidor]
-group by R.ID,R.Nombre,R.Apellidos,MaximoReparto .[El mejor repartidor por ciudad]
+	on TR.Ciudad=MaximoReparto.Ciudad  and [El mejor repartidor por ciudad]=TR.[Cantidad de repartos por repartidor]
+group by TR.ID,TR.Nombre,TR.Apellidos,TR.Ciudad,MaximoReparto.[El mejor repartidor por ciudad]
+order by TR.ID
 go
 
 
@@ -72,6 +73,7 @@ begin transaction
 
 update TMPedidos
 set Importe=10
+where Importe<10
 
 --commit
 rollback
@@ -87,8 +89,8 @@ where year(P.Enviado)=2015
 group by E.ID,E.Denominacion,month(P.Enviado)
 go
 
-select IM.ID,IM.Denominacion,month(P.Enviado) as [Mes],[Maxima recaudacion].[Ventas maximas por mes] as [Mes de mayor recaudacion] from [Importe Mensual] as IM
-inner join TMPedidos as p on IM.ID=P.IDEstablecimiento
+select IM.ID,IM.Denominacion,[Importe Mensual].[Mes],[Maxima recaudacion].[Ventas maximas por mes] as [Mes de mayor recaudacion] from [Importe Mensual] as IM
+inner join TMPedidos as P on IM.ID=P.IDEstablecimiento
 inner join
 	(select IM.Denominacion,max([Total mensual]) as [Ventas maximas por mes] from [Importe Mensual] as IM
 	group by IM.Denominacion) as [Maxima recaudacion] on IM.Denominacion=[Maxima recaudacion].Denominacion
@@ -119,3 +121,21 @@ inner join TMPedidos as P on C.ID = P.IDCliente
 inner join TMMostachones as M on P.ID = M.IDPedido
 where C.Nombre = 'Armando' and C.Apellidos = 'Bronca Segura'
 group by M.Harina
+
+--7. Eliminar a los clientes cuyos nombres empiezan por A
+begin transaction
+	DELETE FROM TMClientes
+	WHERE Nombre LIKE 'A%'
+--commit
+rollback
+
+--8. importe de los establecimientos en los que trabaja un solo repartidor
+select R.IDEstablecimiento,count(distinct R.ID) as [Cantidad de trabajadores],sum(P.Importe) as [Importe] from TMPedidos as P
+left join TMRepartidores as R on P.IDRepartidor=R.ID
+left join TMEstablecimientos as E on R.IDEstablecimiento=E.ID
+group by R.IDEstablecimiento
+having count(distinct R.ID)=1
+
+
+select IDEstablecimiento,count(*) from TMRepartidores
+group by IDEstablecimiento
