@@ -68,14 +68,14 @@ insert into TMBases
 begin transaction 
 
 	update TMPedidos
-	set ID=(select P.IDEstablecimiento from TMPedidos as P			
+	set ID = (select P.IDEstablecimiento from TMPedidos as P			
 				inner join TMMostachones as M on P.ID=M.IDPedido
 				inner join TMBases as B on M.TipoBase=B.Base
 				inner join TMMostachonesToppings as MT on M.ID=MT.IDMostachon
 				inner join TMToppings as T on MT.IDTopping=T.ID
-				where B.Base='Sirope' and T.Topping='Tradicional' and IDEstablecimiento=28)
+				where B.Base='Sirope' and T.Topping='Tradicional')
 
-	where ID=(select P.IDEstablecimiento from TMPedidos as P			--al menos no se me ha olvidad el where)))))))
+	where ID = (select P.IDEstablecimiento from TMPedidos as P			--al menos no se me ha olvidado el where)))))))
 				inner join TMMostachones as M on P.ID=M.IDPedido
 				inner join TMBases as B on M.TipoBase=B.Base
 				inner join TMMostachonesToppings as MT on M.ID=MT.IDMostachon
