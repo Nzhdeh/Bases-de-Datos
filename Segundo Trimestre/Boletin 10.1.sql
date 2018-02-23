@@ -14,21 +14,29 @@ inner join Sales.SalesOrderHeader as SOH on c.CustomerID=SOH.CustomerID
 --inner join Production.Product as P on PSC.ProductSubcategoryID=P.ProductSubcategoryID
 --group by  P.[Name],PK.[Name] 
 go
-create view ProductosPorPrecioYNombre as
-select P.[Name] as NombreProducto,PK.[Name],P.ListPrice from Production.ProductCategory as PK
+alter view ProductosPorPrecioYNombre as
+select P.ProductID,P.[Name] as NombreProducto,PK.[Name] as CategoryName,P.ListPrice from Production.ProductCategory as PK
 inner join Production.ProductSubcategory as PSC on PK.ProductCategoryID=PSC.ProductCategoryID
 inner join Production.Product as P on PSC.ProductSubcategoryID=P.ProductSubcategoryID
-group by  P.[Name],PK.[Name],P.ListPrice 
+group by  P.ProductID,P.[Name],PK.[Name],P.ListPrice 
 go
 
-select PN.NombreProducto,PN.[Name],PrecioMaxMin.PrecioMaximo as Maximo,PrecioMaxMin.PrecioMinimo as Minimo from ProductosPorPrecioYNombre as PN
-inner join 
-(
-	select PN.[Name] as NombreProducto,PN.[Name],max(PN.ListPrice) as PrecioMaximo,min(PN.ListPrice) as PrecioMinimo from ProductosPorPrecioYNombre as PN
-	group by NombreProducto,PN.[Name]
-) as PrecioMaxMin on PN.NombreProducto=PrecioMaxMin.NombreProducto
-group by PN.NombreProducto,PN.[Name],PrecioMaxMin.PrecioMaximo,PrecioMaxMin.PrecioMinimo
+create view ProductoMasCaroYMasBarato as
+select PPPN.CategoryName,max(PPPN.ListPrice) as PrecioMaximo,min(PPPN.ListPrice) as PrecioMinimo  
+from ProductosPorPrecioYNombre as PPPN
+group by PPPN.CategoryName
+go
 
+
+
+select  PPPYN.ProductID, PPPYN.CategoryName,PMC.PrecioMaximo,PMB.PrecioMinimo 
+	from ProductoMasCaroYMasBarato as PMC 
+	inner join ProductosPorPrecioYNombre as PPPYNC
+		 on PPPYN.CategoryName=PMC.CategoryName and PPPYN.ListPrice=PMC.PrecioMaximo
+	inner join ProductosPorPrecioYNombre as PPPYNB
+		 on PPPYN.CategoryName=PMC.CategoryName and PPPYN.ListPrice=PMC.PrecioMinimo
+		
+go
 
 --3. Total de Ventas en cada país en dinero (Ya hecha en el boletín 9.3).
 
