@@ -131,9 +131,20 @@ go
 select * from Customers as C
 inner join Orders as O on C.CustomerID=O.CustomerID
 inner join Employees as E on O.EmployeeID=E.EmployeeID
-where E.FirstName='Robert' and E.LastName='King' and year(O.OrderDate)=1997 --and C.City in ('California','Texas')
+where E.FirstName='Robert' and E.LastName='King' and year(O.OrderDate)=1997 and C.Region in ('CA','TX')
+go
 
-select * from Customers
+begin transaction
+	update Orders
+		set CustomerID =11
+		where CustomerID in (select C.CustomerID from Customers as C
+								inner join Orders as O on C.CustomerID=O.CustomerID
+								inner join Employees as E on O.EmployeeID=E.EmployeeID
+								where E.FirstName='Robert' and E.LastName='King' and year(O.OrderDate)=1997 and C.Region in ('CA','TX'))
+--commit
+rollback
+go
+
 --6. Inserta un nuevo producto con los siguientes datos:
 --	ProductID: 90
 --	ProductName: Nesquick Power Max
@@ -204,3 +215,6 @@ where P.ProductName='Outback Lager'
 --9. El pasado 20 de enero, Margaret Peacock consiguió vender una caja de Nesquick Power Max a todos 
 --los clientes que le habían comprado algo anteriormente. Los datos de envío (dirección, transportista, etc) 
 --son los mismos de alguna de sus ventas anteriores a ese cliente).
+select * from  Employees as E
+inner join Orders as O on E.EmployeeID=O.EmployeeID
+where E.FirstName='Margaret' and E.LastName='Peacock'
