@@ -126,10 +126,15 @@ go
 --select * from EmployeeTerritories ET JOIN Territories T ON ET.TerritoryID = T.TerritoryID
 --Where ET.EmployeeID = 11 
 
---6. Haz que las ventas del año 97 de Robert King que haya hecho a clientes de los estados de 
+--5. Haz que las ventas del año 97 de Robert King que haya hecho a clientes de los estados de 
 --California y Texas se le asignen al nuevo empleado.
+select * from Customers as C
+inner join Orders as O on C.CustomerID=O.CustomerID
+inner join Employees as E on O.EmployeeID=E.EmployeeID
+where E.FirstName='Robert' and E.LastName='King' and year(O.OrderDate)=1997 --and C.City in ('California','Texas')
 
---7. Inserta un nuevo producto con los siguientes datos:
+select * from Customers
+--6. Inserta un nuevo producto con los siguientes datos:
 --	ProductID: 90
 --	ProductName: Nesquick Power Max
 --	SupplierID: 12
@@ -141,7 +146,26 @@ go
 --	ReorderLevel: 0
 --	Discontinued: 0
 
---8. Inserta un nuevo producto con los siguientes datos:
+--SET IDENTITY_INSERT Products ON  --para desactivar el identity temporalmente
+--SET IDENTITY_INSERT Products OFF	--para volver a activarlo
+
+INSERT INTO [dbo].[Products]
+           ([ProductID]
+		   ,[ProductName]
+           ,[SupplierID]
+           ,[CategoryID]
+           ,[QuantityPerUnit]
+           ,[UnitPrice]
+           ,[UnitsInStock]
+           ,[UnitsOnOrder]
+           ,[ReorderLevel]
+           ,[Discontinued])
+     VALUES
+           (90,'Nesquick Power Max',12,3,'10 x 300g',2.40,38,0,0,0)
+GO
+select * from Products
+
+--7. Inserta un nuevo producto con los siguientes datos:
 --	ProductID: 91
 --	ProductName: Mecca Cola
 --	SupplierID: 1
@@ -153,9 +177,30 @@ go
 --	ReorderLevel: 0
 --	Discontinued: 0
 
---9. Todos los que han comprado "Outback Lager" han comprado cinco años después la misma cantidad de 
---Mecca Cola al mismo vendedor
+INSERT INTO [dbo].[Products]
+           ([ProductName]
+           ,[SupplierID]
+           ,[CategoryID]
+           ,[QuantityPerUnit]
+           ,[UnitPrice]
+           ,[UnitsInStock]
+           ,[UnitsOnOrder]
+           ,[ReorderLevel]
+           ,[Discontinued])
+     VALUES
+           ('Mecca Cola',1,1,'6 x 75 cl',7.35,14,0,0,0)
+GO
 
---10. El pasado 20 de enero, Margaret Peacock consiguió vender una caja de Nesquick Power Max a todos 
+
+--8. Todos los que han comprado "Outback Lager" han comprado cinco años después la misma cantidad de 
+--Mecca Cola al mismo vendedor
+select * from Customers as C
+inner join Orders as O on C.CustomerID=O.CustomerID
+inner join [Order Details] as OD on O.OrderID=OD.OrderID
+inner join Products as P on OD.ProductID=P.ProductID
+where P.ProductName='Outback Lager'
+
+
+--9. El pasado 20 de enero, Margaret Peacock consiguió vender una caja de Nesquick Power Max a todos 
 --los clientes que le habían comprado algo anteriormente. Los datos de envío (dirección, transportista, etc) 
 --son los mismos de alguna de sus ventas anteriores a ese cliente).
