@@ -22,11 +22,12 @@ order by [Numero de veces apostados] desc
 --veces en el último mes. Se considera el mes de febrero.
 --La cantidad que se les regalará será un 5% del total que hayan apostado en ese mes
 
-select A.IDJugador,count(A.IDJugada) as [Veces apostados],sum(A.Importe) as [Apuesta Total por jugador],TA.Premio,(TA.Premio+(TA.Premio*0.05)) as [Premio mas regalo] from COL_Apuestas as A
+create view Ejercicio2 as
+select A.IDJugador,count(A.IDJugada) as [Veces apostados],sum(A.Importe) as [Apuesta Total por jugador],sum(A.Importe)*0.05 as [Premio] from COL_Apuestas as A
 inner join COL_Jugadas as J on A.IDJugada=J.IDJugada
 inner join COL_TiposApuesta as TA on A.Tipo=TA.ID
-where month(J.MomentoJuega)=2
-group by A.IDJugador,TA.Premio
+where month(J.MomentoJuega)=2 and year(J.MomentoJuega)=2018
+group by A.IDJugador
 having count(A.IDJugada)>3
 
 --Ejercicio 3
