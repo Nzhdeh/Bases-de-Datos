@@ -30,6 +30,29 @@ where month(J.MomentoJuega)=2 and year(J.MomentoJuega)=2018
 group by A.IDJugador
 having count(A.IDJugada)>3
 
+-----------------segunda solucion
+go
+create function [Regalar Saldo] (@año as smallint,@mes as smallint)
+	returns table as 
+		return
+			(
+				select A.IDJugador,count(A.IDJugada) as [Veces apostados],sum(A.Importe) as [Apuesta Total por jugador],sum(A.Importe)*0.05 as [Premio] from COL_Apuestas as A
+					inner join COL_Jugadas as J on A.IDJugada=J.IDJugada
+					inner join COL_TiposApuesta as TA on A.Tipo=TA.ID
+				where month(J.MomentoJuega)=@mes and year(J.MomentoJuega)=@año
+				group by A.IDJugador
+				having count(A.IDJugada)>3
+			)
+
+declare @año smallint
+declare @mes smallint
+
+set @año=2
+set @mes=2018
+
+select * from [Regalar Saldo](@año,@mes)
+go
+
 --Ejercicio 3
 --El día 2 de febrero se celebró el día de la marmota. Para conmemorarlo, el casino ha decidido volver a repetir 
 --todas las jugadas que se hicieron ese día, pero poniéndoles fecha de mañana (con la misma hora) y permitiendo que 
