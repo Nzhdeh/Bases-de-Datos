@@ -2,6 +2,7 @@
 use Northwind
 go
 
+set dateformat ymd
 --1. Inserta un nuevo cliente.
 select * from Customers
 insert into Customers
@@ -19,7 +20,6 @@ where CompanyName='Speedy Express'
 
 select * from Employees
 where LastName='Callahan' and FirstName='Laura'
-
 go
 begin transaction
 
@@ -37,14 +37,33 @@ insert into [dbo].[Orders]
            ,[ShipRegion]
            ,[ShipPostalCode]
            ,[ShipCountry])
---select 'NAZIS',8,getdate(),getdate(),getdate(),1,33.25,'Disco disco Partizani','In the Sky','Berlin','GER',41019,'Germany' from Products
-values('NAZIS',8,getdate(),getdate(),getdate(),1,33.25,'Disco disco Partizani','In the Sky','Berlin','GER',41019,'Germany')
+values('NAZIS',8,getdate(),getdate(),getdate(),1,33.25,'Disco disco Partizani','In the Sky','Berlin','GER',41019,'Germany'),
+	  ('NAZIS',8,getdate(),getdate(),getdate(),1,25.25,'Disco disco Partizani','In the Sky','Berlin','GER',41019,'Germany'),
+	  ('NAZIS',8,getdate(),getdate(),getdate(),1,15.15,'Disco disco Partizani','In the Sky','Berlin','GER',41019,'Germany')
 go
 
+--commit
 rollback
 
-select * from Orders
-where CustomerID='NAZIS'
+select * from [Order Details]
+
+insert into [dbo].[Order Details]
+           ([OrderID]
+           ,[ProductID]
+           ,[UnitPrice]
+           ,[Quantity]
+           ,[Discount])
+values (11080,16,17.45,3,0)
+
+
+insert into [Order Details]
+select 11081,P.ProductID,P.UnitPrice,10,0 from Products as P
+where P.ProductName='Inlagd Sill'
+
+insert into [Order Details]
+select 11082,P.ProductID,P.UnitPrice,25,0 from Products as P
+where P.ProductName='Filo Mix'
+
 --3. Ante la bajada de ventas producida por la crisis, hemos de adaptar nuestros precios
 -- según las siguientes reglas:
 
@@ -188,7 +207,7 @@ select * from Products
 --	ReorderLevel: 0
 --	Discontinued: 0
 
-INSERT INTO [dbo].[Products]
+insert into [dbo].[Products]
            ([ProductName]
            ,[SupplierID]
            ,[CategoryID]
@@ -198,23 +217,59 @@ INSERT INTO [dbo].[Products]
            ,[UnitsOnOrder]
            ,[ReorderLevel]
            ,[Discontinued])
-     VALUES
+     values
            ('Mecca Cola',1,1,'6 x 75 cl',7.35,14,0,0,0)
 GO
 
 
 --8. Todos los que han comprado "Outback Lager" han comprado cinco años después la misma cantidad de 
 --Mecca Cola al mismo vendedor
-select * from Customers as C
-inner join Orders as O on C.CustomerID=O.CustomerID
+begin transaction
+insert into Orders
+select VentasOutbackLager.CustomerID,VentasOutbackLager.EmployeeID,dateadd(year,5,VentasOutbackLager.OrderDate),VentasOutbackLager.RequiredDate,VentasOutbackLager.ShippedDate,VentasOutbackLager.ShipVia,VentasOutbackLager.Freight,VentasOutbackLager.ShipName,VentasOutbackLager.ShipAddress,VentasOutbackLager.ShipCity,VentasOutbackLager.ShipRegion,VentasOutbackLager.ShipPostalCode,VentasOutbackLager.ShipCountry
+from(
+select O.CustomerID,O.EmployeeID,O.RequiredDate,O.ShippedDate,O.ShipVia,O.Freight,O.ShipName,O.ShipAddress,O.ShipCity,O.ShipRegion,O.ShipPostalCode,O.ShipCountry,sum(OD.Quantity) as Cantidad,O.OrderDate
+from Orders as O
 inner join [Order Details] as OD on O.OrderID=OD.OrderID
 inner join Products as P on OD.ProductID=P.ProductID
 where P.ProductName='Outback Lager'
-
+group by O.CustomerID,O.EmployeeID,O.OrderDate,O.RequiredDate,O.ShippedDate,O.ShipVia,O.Freight,O.ShipName,O.ShipAddress,O.ShipCity,O.ShipRegion,O.ShipPostalCode,O.ShipCountry
+--ORDER BY O.CustomerID
+) as VentasOutbackLager
+--commit
+rollback
 
 --9. El pasado 20 de enero, Margaret Peacock consiguió vender una caja de Nesquick Power Max a todos 
 --los clientes que le habían comprado algo anteriormente. Los datos de envío (dirección, transportista, etc) 
 --son los mismos de alguna de sus ventas anteriores a ese cliente).
-select * from  Employees as E
-inner join Orders as O on E.EmployeeID=O.EmployeeID
+go
+create view VentasNesquick20Enero as 
+select O.OrderID,O.CustomerID,O.EmployeeID,O.OrderDate,O.RequiredDate,O.ShippedDate,O.ShipVia,O.Freight,O.ShipName,O.ShipAddress,O.ShipCity,O.ShipRegion,O.ShipPostalCode,O.ShipCountry
+from Orders as O
+inner join Employees as E on O.EmployeeID=E.EmployeeID
 where E.FirstName='Margaret' and E.LastName='Peacock'
+
+go
+
+begin transaction
+insert into [dbo].[Orders]
+select CustomerID,[EmployeeID]
+           ,'2017-01-20 00:00:00.000'
+           ,'2017-01-20 00:00:00.000'
+           ,'2017-01-20 00:00:00.000'
+           ,[ShipVia]
+           ,[Freight]
+           ,[ShipName]
+           ,[ShipAddress]
+           ,[ShipCity]
+           ,[ShipRegion]
+           ,[ShipPostalCode]
+           ,[ShipCountry]
+from VentasMargaret
+--rollback
+select * from Orders
+select * from [Order Details]
+go
+insert into [Order Details]
+select VentasMargaret.OrderID,90,2.40,1,0.0
+from VentasMargaret

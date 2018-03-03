@@ -39,7 +39,7 @@ having count(A.IDJugada)>3
 --Ejercicio 4
 --Crea una vista que nos muestre, para cada jugador, nombre, apellidos, Nick, número de apuestas realizadas, 
 --total de dinero apostado y total de dinero ganado/perdido.
-
+select * from 
 --Ejercicio 5
 --Nos comunican que la policía ha detenido a nuestro cliente Ombligo Pato por delitos de estafa, falsedad, 
 --administración desleal y mal gusto para comprar bañadores. 
