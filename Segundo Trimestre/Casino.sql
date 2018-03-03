@@ -47,8 +47,8 @@ create function [Regalar Saldo] (@año as smallint,@mes as smallint)
 declare @año smallint
 declare @mes smallint
 
-set @año=2
-set @mes=2018
+set @año=2018
+set @mes=2
 
 select * from [Regalar Saldo](@año,@mes)
 go
