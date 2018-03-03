@@ -184,3 +184,4 @@ inner join Orders as O on E.EmployeeID=O.EmployeeID
 inner join [Order Details] as OD on O.OrderID=OD.OrderID
 group by E.EmployeeID,E.FirstName,E.LastName,year(O.OrderDate)
 ) as [Año consecutivo] on E.EmployeeID=[Año consecutivo].EmployeeID
+group by E.EmployeeID,E.FirstName,E.LastName,year(O.OrderDate)

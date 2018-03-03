@@ -12,7 +12,7 @@ go
 --Escribe una consulta que nos devuelva el número de veces que se ha apostado a cada número con apuestas de los tipos 10, 13 o 15.
 --Ordena el resultado de mayor a menos popularidad.
 select J.Numero,A.Tipo,count(*) as [Numero de veces apostados] from COL_Jugadas as J
-inner join COL_Apuestas as A on J.IDJugada=A.IDJugada
+	inner join COL_Apuestas as A on J.IDJugada=A.IDJugada
 where A.Tipo in(10,13,15)
 group by J.Numero,A.Tipo
 order by [Numero de veces apostados] desc
@@ -24,8 +24,8 @@ order by [Numero de veces apostados] desc
 
 create view Ejercicio2 as
 select A.IDJugador,count(A.IDJugada) as [Veces apostados],sum(A.Importe) as [Apuesta Total por jugador],sum(A.Importe)*0.05 as [Premio] from COL_Apuestas as A
-inner join COL_Jugadas as J on A.IDJugada=J.IDJugada
-inner join COL_TiposApuesta as TA on A.Tipo=TA.ID
+	inner join COL_Jugadas as J on A.IDJugada=J.IDJugada
+	inner join COL_TiposApuesta as TA on A.Tipo=TA.ID
 where month(J.MomentoJuega)=2 and year(J.MomentoJuega)=2018
 group by A.IDJugador
 having count(A.IDJugada)>3
@@ -39,7 +39,13 @@ having count(A.IDJugada)>3
 --Ejercicio 4
 --Crea una vista que nos muestre, para cada jugador, nombre, apellidos, Nick, número de apuestas realizadas, 
 --total de dinero apostado y total de dinero ganado/perdido.
-select * from 
+create view Ejercicio4Casino as
+select J.Nombre,J.Apellidos,J.Nick,count(*) as [Numero de apuestas realizadas],sum(A.Importe) as [Total apostado],(sum(TA.Premio)-sum(A.Importe)) as [Ganado/Perdido] from COL_Jugadores as J
+	inner join COL_Apuestas as A on J.ID=A.IDJugador
+	inner join COL_TiposApuesta as TA on A.Tipo=TA.ID
+group by J.Nombre,J.Apellidos,J.Nick
+
+
 --Ejercicio 5
 --Nos comunican que la policía ha detenido a nuestro cliente Ombligo Pato por delitos de estafa, falsedad, 
 --administración desleal y mal gusto para comprar bañadores. 
@@ -47,3 +53,26 @@ select * from
 --rastro de su paso por nuestro casino.
 --Borra todas las apuestas que haya realizado, pero no busques su ID a mano en la tabla COL_Clientes. 
 --Utiliza su Nick (bankiaman) para identificarlo en la instrucción DELETE.
+
+
+--primero hay que eliminar todos los datos del la tabla COL_Apuestas porque el ID es clave ajena
+begin transaction
+delete from COL_Apuestas 
+where IDJugador in (select J.ID from COL_Jugadores as J
+					inner join COL_Apuestas as A on J.ID=A.IDJugador
+					where J.Nick='bankiaman')
+--commit
+rollback
+
+select * from COL_Apuestas as A
+inner join COL_Jugadores as J on A.IDJugador=J.ID
+					where J.Nick='bankiaman'
+
+--ahora eliminaremos al jugador
+begin transaction
+
+delete from COL_Jugadores
+where Nick='bankiaman'
+
+--commit
+rollback
