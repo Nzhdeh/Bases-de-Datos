@@ -44,6 +44,7 @@ create function [Regalar Saldo] (@año as smallint,@mes as smallint)
 				having count(A.IDJugada)>3
 			)
 
+
 declare @año smallint
 declare @mes smallint
 
@@ -58,6 +59,25 @@ go
 --todas las jugadas que se hicieron ese día, pero poniéndoles fecha de mañana (con la misma hora) y permitiendo que 
 --los jugadores apuesten. El número ganador de cada jugada se pondrá a NULL y el NoVaMas a 0.
 --Crea esas nuevas filas con una instrucción INSERT-SELECT
+
+select IDMesa,IDJugada, MomentoJuega,dateadd(day,dateDiff(day,dateFromParts(2018,2,2),getDate())+1,MomentoJuega) from COL_Jugadas
+where MomentoJuega Between DateFromParts(2018,2,2) And DateFromParts(2018,2,4)
+select * from COL_Jugadas
+
+begin transaction
+go
+insert into [dbo].[COL_Jugadas]
+           ([IDMesa]
+           ,[IDJugada]
+           ,[MomentoJuega]
+           ,[NoVaMas]
+           ,[Numero])
+     select [IDMesa],[IDJugada]+1544,dateadd(day,dateDiff(day,dateFromParts(2018,2,2),getDate())+1,MomentoJuega),0,null from COL_Jugadas as J
+	 where day(J.MomentoJuega)=2 and month(J.MomentoJuega)=2 and year(J.MomentoJuega)=2018
+go
+rollback
+
+--2956 3050
 
 --Ejercicio 4
 --Crea una vista que nos muestre, para cada jugador, nombre, apellidos, Nick, número de apuestas realizadas, 
