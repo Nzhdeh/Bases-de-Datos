@@ -118,3 +118,46 @@ insert into [dbo].[LTCarreras]
 			inner join LTCaballosCarreras as CC on C.ID=CC.IDCarrera
 			inner join LTCaballos as CB on CC.IDCaballo=CB.ID
 			where CB.Nombre='Ciclon'
+
+
+
+--8. El nombre completo de cada jugador que haya apostado al caballo que haya nacido en 2009 y que mas veces haya ganado
+alter view [Caballos ganadores] as
+select C.ID,C.Nombre,count(*) as [Veces Ganado] from LTCaballos as C
+inner join LTCaballosCarreras as CC on C.ID=CC.IDCaballo
+where year(C.FechaNacimiento)=2008 and CC.Posicion = 1
+group by C.ID,C.Nombre
+
+
+
+alter view [El caballo que mas ha ganado] as
+select max([Veces Ganado]) as [Maximo ganador] from [Caballos ganadores]
+
+
+
+select CG.ID,J.Nombre,J.Apellidos from [Caballos ganadores] as CG
+inner join [El caballo que mas ha ganado] as EG on CG.[Veces Ganado]=EG.[Maximo ganador]
+inner join LTApuestas as A on CG.ID=A.IDCaballo
+inner join LTJugadores as J on A.IDJugador=J.ID
+
+
+
+
+--9. Nombre del hipodromo donde se haya hecho la apuesta mas grande a un caballo que llevase un numero par
+create view [Caballos con numeros pares] as 
+select IDCaballo,IDCarrera,Numero from LTCaballosCarreras
+where numero%2=0
+
+create view [Apuestas a caballos por Hipodromo] as
+select A.IDCaballo,C.Hipodromo,sum(A.Importe) as [Cantidad apostado por caballo] from LTApuestas as A
+inner join [Caballos con numeros pares] as CNP on A.IDCaballo=CNP.IDCaballo
+inner join LTCarreras as C on A.IDCarrera=C.ID
+group by A.IDCaballo,C.Hipodromo
+
+create view Apuesta as
+select max([Cantidad apostado por caballo]) as [Apuesta maxima por hipodromo] from [Apuestas a caballos por Hipodromo]
+
+select distinct H.Nombre from [Apuestas a caballos por Hipodromo] as ACH
+inner join Apuesta as A on ACH.[Cantidad apostado por caballo]=A.[Apuesta maxima por hipodromo]
+inner join LTHipodromos as H on ACH.Hipodromo=H.Nombre
+inner join [Caballos con numeros pares] as CNP on ACH.IDCaballo=CNP.IDCaballo
