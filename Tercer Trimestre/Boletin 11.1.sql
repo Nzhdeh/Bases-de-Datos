@@ -127,7 +127,6 @@ group by  OD.ProductID, year(O.OrderDate)
 
 go
 
-go
 create view [Ventas del 96] as
 
 select OD.ProductID,cast(sum(OD.Quantity*(OD.UnitPrice*(1-OD.Discount))) as decimal (10,2)) as [Ventas96],year(O.OrderDate) as [Año] from Orders as O
@@ -137,11 +136,11 @@ group by  OD.ProductID, year(O.OrderDate)
 
 go
 
-go
-alter view [IncrementoDecrementoVentas] as
+create view [IncrementoDecrementoVentas] as
 
 select V7.ProductID as IDProducto, ((V7.[Ventas97] / CAST ((V6.[Ventas96]) as decimal (10,2)) - 1) * 100) as [Incremento] from [Ventas del 96] as V6
 inner join [Ventas del 97] as V7 on V6.ProductID=V7.ProductID
+
 go
 
 begin transaction 
@@ -150,8 +149,14 @@ begin transaction
 	set UnitPrice=	case
 						when IncrementoDecrementoVentas.Incremento < 0 then (UnitPrice-UnitPrice*0.1)
 						when IncrementoDecrementoVentas.Incremento between 0 and 10 then UnitPrice
-						when IncrementoDecrementoVentas.Incremento between 11 and 50 then (UnitPrice+UnitPrice*0.05)
-						else (UnitPrice + UnitPrice * 0.1) -- Con un maximo de 2,25 ???
+						when IncrementoDecrementoVentas.Incremento between 11 and 50 then (UnitPrice+UnitPrice*0.05)																			
+						else 
+							case
+								when UnitPrice > 22.5
+									then	(UnitPrice + 2.25)
+								else
+										(UnitPrice* 1.1)
+								end
 					end
 	from IncrementoDecrementoVentas
 	where Products.ProductID = [IncrementoDecrementoVentas].IDProducto
