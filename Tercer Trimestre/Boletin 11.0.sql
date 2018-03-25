@@ -106,7 +106,7 @@ create function [Kilometros Recorridos Por Tren] (@FechaInicial as datetime, @Fe
 	returns table as
 		return 
 		(
-			
+			select * from 
 		)
 go
 
@@ -120,8 +120,44 @@ select * from [Kilometros Recorridos Por Tren] (@FechaInicial,@FechaFinal)
 
 --6. Crea una función inline que nos devuelva el número de trenes que ha circulado por cada línea en un periodo de tiempo. 
 --El principio y el fin de ese periodo se pasarán como parámetros. Se devolverá el ID, denominación y color de la línea
+go
+create function [Numero de Trenes por Linea] (@FechaInicial as datetime, @FechaFinal as datetime)
+	returns table as
+		return 
+		(
+			select Tren,count(*) as [Numero de trenes] from LM_Recorridos
+			where Momento between @FechaInicial and @FechaFinal
+			group by Tren
+		)
+go
 
+declare @FechaInicial as date
+declare @FechaFinal as date
+
+set @FechaInicial='20170225'
+set @FechaFinal ='20170226'
+
+select * from [Numero de Trenes por Linea] (@FechaInicial,@FechaFinal)
 
 --7. Crea una función inline que nos devuelva el tiempo total que cada usuario ha pasado en el metro en un periodo de tiempo.
 --El principio y el fin de ese periodo se pasarán como parámetros. Se devolverá ID, nombre y apellidos del pasajero.
 --El tiempo se expresará en horas y minutos.
+go
+create function [Tiempo Total por Viajero] (@FechaInicial as datetime, @FechaFinal as datetime)
+	returns table as
+		return 
+		(
+			select P.ID,P.Nombre,P.Apellidos,(V.MomentoSalida-V.MomentoEntrada) as [Tiempo] from LM_Pasajeros as P
+			inner join LM_Viajes as V on P.ID=V.IDPasajero
+			--where (MomentoEntrada between @FechaInicial and @FechaFinal) or (MomentoSalida between @FechaInicial and @FechaFinal)
+			group by P.ID,P.Nombre,P.Apellidos,V.MomentoSalida,V.MomentoEntrada------------------------???????????
+		)
+go
+
+declare @FechaInicial as date
+declare @FechaFinal as date
+
+set @FechaInicial='20170225'
+set @FechaFinal ='20170226'
+
+select * from [Tiempo Total por Viajero] (@FechaInicial,@FechaFinal)
