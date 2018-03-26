@@ -106,7 +106,11 @@ create function [Kilometros Recorridos Por Tren] (@FechaInicial as datetime, @Fe
 	returns table as
 		return 
 		(
-			select * from 
+			select R.Tren,sum(I.Distancia) as [Distancias recorridas por tren] from LM_Recorridos as R
+			inner join LM_Lineas as L on R.Linea=L.ID
+			inner join LM_Itinerarios as I on L.ID=I.Linea
+			where R.Momento between @FechaInicial and @FechaFinal
+			group by R.Tren
 		)
 go
 
@@ -147,7 +151,7 @@ create function [Tiempo Total por Viajero] (@FechaInicial as datetime, @FechaFin
 	returns table as
 		return 
 		(
-			select P.ID,P.Nombre,P.Apellidos,(V.MomentoSalida-V.MomentoEntrada) as [Tiempo] from LM_Pasajeros as P
+			select P.ID,P.Nombre,P.Apellidos,(V.MomentoSalida-V.MomentoEntrada) as [Tiempo] from LM_Pasajeros as P		--hay que pasar las fechas a segundos,sumarlas y luego convertirlas en horas y minutos
 			inner join LM_Viajes as V on P.ID=V.IDPasajero
 			--where (MomentoEntrada between @FechaInicial and @FechaFinal) or (MomentoSalida between @FechaInicial and @FechaFinal)
 			group by P.ID,P.Nombre,P.Apellidos,V.MomentoSalida,V.MomentoEntrada------------------------???????????
