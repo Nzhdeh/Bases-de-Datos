@@ -1,8 +1,14 @@
 use LeoMetro
 go
 
---1. Crea una función inline que nos devuelva el número de estaciones que ha recorrido cada tren en un determinado periodo de tiempo. 
---El principio y el fin de ese periodo se pasarán como parámetros
+
+--prototipo: create function [Estaciones Recorridas] (@FechaInicial as datetime, @FechaFinal as datetime)
+--comentarios: es una funcion inline que sirve para saber las estaciones recorridas por cada tren en un periodo dado
+--precondiciones: las fechas tiene que ser correctas
+--entradas: dos fechas
+--salidas: un numero, ID del tren
+--entr/sal: no hay
+--postcondiciones: se devolverá una lista con el numero de estaciones y el ID del tren 
 
 --begin transaction
 --rollback
