@@ -3,7 +3,7 @@ go
 
 
 --prototipo: create function [Estaciones Recorridas] (@FechaInicial as datetime, @FechaFinal as datetime)
---comentarios: es una funcion inline que sirve para saber las estaciones recorridas por cada tren en un periodo dado
+--comentarios: es una funcion inline que sirve para saber el numero de las estaciones recorridas por cada tren en un periodo dado
 --precondiciones: las fechas tiene que ser correctas
 --entradas: dos fechas
 --salidas: un numero, ID del tren
