@@ -6,7 +6,15 @@ go
 --1.Crea una función inline llamada FnCarrerasCaballo que reciba un rango de fechas (inicio y fin) 
 --y nos devuelva el número de carreras disputadas por cada caballo entre esas dos fechas. 
 --Las columnas serán ID (del caballo), nombre, sexo, fecha de nacimiento y número de carreras disputadas.
-
+---------------------------------------------------------------------------------------------------------------
+--prototipo: create function FnCarrerasCaballo (@FechaIni as date, @FechaFin as date )
+--comentarios: es una funcion inline que sirve para devolver el número de carreras disputadas por cada caballo entre dos fechas.
+--precondiciones: las fechas tiene que ser correctas
+--entradas: dos fechas
+--salidas: un numero
+--entr/sal: no hay
+--postcondiciones: se devolverá el ID (del caballo), nombre, sexo, fecha de nacimiento y número de carreras disputadas.
+---------------------------------------------------------------------------------------------------------------
 create function FnCarrerasCaballo (@FechaIni as date, @FechaFin as date )
 	returns table as 
 		return
@@ -18,7 +26,7 @@ create function FnCarrerasCaballo (@FechaIni as date, @FechaFin as date )
 				where CR.Fecha between @FechaIni and @FechaFin
 				group by C.ID,C.Nombre,C.Sexo,C.FechaNacimiento
 			)
-			go
+go
 
 declare @FechaInicial as date
 declare @FechaFinal as date
@@ -30,7 +38,16 @@ select * from FnCarrerasCaballo (@FechaInicial,@FechaFinal)
 go
 --2.Crea una función escalar llamada FnTotalApostadoCC que reciba como parámetros el ID de un 
 --caballo y el ID de una carrera y nos devuelva el dinero que se ha apostado a ese caballo en esa carrera.
-
+---------------------------------------------------------------------------------------------------------------
+--prototipo: create function FnTotalApostadoCC (@IDCaballo as  smallint, @IDCarrera as  smallint)
+--comentarios: es una funcion escalar que recibe como parámetros el ID de un caballo y el ID de una carrera
+--			   y nos devolvuelve el dinero que se ha apostado a ese caballo en esa carrera.
+--precondiciones: El id de caballo y el id de la carrera tienen que existir
+--entradas: IDCaballo,IDCarrera
+--salidas: un numero real
+--entr/sal: no hay
+--postcondiciones: se devolverá el dinero que se ha apostado a ese caballo en esa carrera.
+---------------------------------------------------------------------------------------------------------------
 create function FnTotalApostadoCC (@IDCaballo as  smallint, @IDCarrera as  smallint)
 	returns money as
 		begin 
@@ -54,32 +71,35 @@ go
 --3.Crea una función escalar llamada FnPremioConseguido que reciba como parámetros el ID de una apuesta 
 --y nos devuelva el dinero que ha ganado dicha apuesta. Si todavía no se conocen las posiciones de los caballos, devolverá un NULL
 
-create function FnPremioConseguido (@IDApuesta as int)
+alter function FnPremioConseguido (@IDApuesta as int)
 	returns money as
 		begin 
 			declare @Moneda as money
-				if exists (select * from LTCarreras)
-					begin 
-						
-					end
-
-				else
-					begin
-						@Moneda=null
-					end
+			
+			select A.ID,@Moneda	from LTApuestas as A
+				inner join LTCaballosCarreras as CC on A.IDCaballo=CC.IDCaballo
+				--inner join
+				--(
+				--set CC.Posicion=
+				--	case 
+				--		when 1 then @Moneda=A.Importe*CC.Premio1
+				--		when 2 then @Moneda=A.Importe*CC.Premio2
+				--		when is null then @Moneda=A.Importe*CC.Premio1
+				--		else 'No premiado'
+				--	end
+				--)
+				where @IDApuesta=A.ID
 			return @Moneda
 		end
 go
 
-declare @IDCaballo as  smallint
-declare @IDCarrera as  smallint
+declare @IDApuesta as int
 
-set @IDCaballo=20
-set @IDCarrera=4
+set @IDApuesta=1
 
-select dbo.FnTotalApostadoCC (@IDCaballo,@IDCarrera)
+select dbo.FnPremioConseguido (@IDApuesta)
 go
-
+		
 --4.El procedimiento para calcular los premios en las apuestas de una carrera (los valores que deben 
 --figurar en la columna Premio1 y Premio2) es el siguiente:
 
