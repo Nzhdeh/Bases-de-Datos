@@ -76,18 +76,17 @@ alter function FnPremioConseguido (@IDApuesta as int)
 		begin 
 			declare @Moneda as money
 			
-			select A.ID,@Moneda	from LTApuestas as A
-				inner join LTCaballosCarreras as CC on A.IDCaballo=CC.IDCaballo
-				--inner join
-				--(
-				--set CC.Posicion=
-				--	case 
-				--		when 1 then @Moneda=A.Importe*CC.Premio1
-				--		when 2 then @Moneda=A.Importe*CC.Premio2
-				--		when is null then @Moneda=A.Importe*CC.Premio1
-				--		else 'No premiado'
-				--	end
-				--)
+			select @Moneda=	
+				(
+					case 
+						when CC.Posicion = 1 then A.Importe*CC.Premio1
+						when CC.Posicion = 2 then A.Importe*CC.Premio2
+						when CC.Posicion > 2 then 0
+						else null 
+					end
+				)
+				from LTApuestas as A
+				inner join LTCaballosCarreras as CC on A.IDCaballo=CC.IDCaballo and A.IDCarrera=CC.IDCarrera
 				where @IDApuesta=A.ID
 			return @Moneda
 		end
@@ -95,7 +94,7 @@ go
 
 declare @IDApuesta as int
 
-set @IDApuesta=1
+set @IDApuesta=5
 
 select dbo.FnPremioConseguido (@IDApuesta)
 go
