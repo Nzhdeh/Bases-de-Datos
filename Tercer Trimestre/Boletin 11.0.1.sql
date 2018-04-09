@@ -104,6 +104,9 @@ go
 
 --	a.Se calcula el total de dinero apostado en esa carrera
 
+select IDCarrera,sum(Importe) as [Dinero apostado] from LTApuestas
+group by IDCarrera
+
 --	b.El valor de la columna Premio1 para cada caballo se calcula 
 --	dividiendo el total de dinero apostado entre lo apostado a ese 
 --	caballo y se multiplica el resultado por 0.6
