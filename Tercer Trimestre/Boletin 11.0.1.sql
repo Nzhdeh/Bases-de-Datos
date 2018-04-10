@@ -70,7 +70,16 @@ select dbo.FnTotalApostadoCC (@IDCaballo,@IDCarrera)
 go
 --3.Crea una función escalar llamada FnPremioConseguido que reciba como parámetros el ID de una apuesta 
 --y nos devuelva el dinero que ha ganado dicha apuesta. Si todavía no se conocen las posiciones de los caballos, devolverá un NULL
-
+---------------------------------------------------------------------------------------------------------------
+--prototipo: create function FnPremioConseguido (@IDApuesta as int)
+--comentarios: es una funcion escalar que recibe como parámetros el ID de una apuesta
+--			   y nos devolvuelve el dinero que ha ganado dicha apuesta.
+--precondiciones: el ID de una apuesta 
+--entradas: IDApuesta
+--salidas: un numero real
+--entr/sal: no hay
+--postcondiciones: se devolverá el dinero que se ha ganado por apuesta.
+---------------------------------------------------------------------------------------------------------------
 alter function FnPremioConseguido (@IDApuesta as int)
 	returns money as
 		begin 
@@ -104,19 +113,134 @@ go
 
 --	a.Se calcula el total de dinero apostado en esa carrera
 
-select IDCarrera,sum(Importe) as [Dinero apostado] from LTApuestas
-group by IDCarrera
+--create view [Total dinero apostado] as
 
+--select IDCarrera,sum(Importe) as [Dinero apostado] from LTApuestas
+--group by IDCarrera
+
+create function [TotalDineroApostado] (@IDCarrera as smallint)
+returns money as
+		begin 
+			declare @DineroTotalPorApuesta as money
+			
+			select @DineroTotalPorApuesta=sum(Importe)
+
+			from LTApuestas
+			where @IDCarrera=IDCarrera
+
+			return @DineroTotalPorApuesta
+		end
+go
+
+declare @IDCarrera as smallint
+
+set @IDCarrera=1
+
+select dbo.FnPremioConseguido (@IDCarrera)
+go
 --	b.El valor de la columna Premio1 para cada caballo se calcula 
 --	dividiendo el total de dinero apostado entre lo apostado a ese 
 --	caballo y se multiplica el resultado por 0.6
+create function [Calcular Premio1] (@IDCaballo as smallint, @IDCarrera as smallint)
+returns decimal (4,1) as
+	begin 
+		declare @Premio as decimal (4,1)
+		if(dbo.FnTotalApostadoCC(@IDCaballo, @IDCarrera)=0)
+			begin 
+				set @Premio=100
+			end
+		else
+			begin
+				select @Premio=(dbo.[TotalDineroApostado](@IDCarrera)/dbo.TotalApostadoCC(@IDCaballo, @IDCarrera))*0.6
+				from LTApuestas as A
+				inner join LTCaballosCarreras as CC on A.IDCaballo=CC.IDCaballo and A.IDCarrera=CC.IDCarrera
+				where @IDCaballo=CC.IDCaballo and @IDCarrera=CC.IDCarrera
+			end
+		return @Premio
+	end
+go
 
+declare @IDCaballo as  smallint
+declare @IDCarrera as  smallint
+
+set @IDCaballo=20
+set @IDCarrera=4
+
+select  dbo.[Calcular Premio1] (@IDCaballo,@IDCarrera)
+go	
 --	c.El valor de la columna Premio2 para cada caballo se calcula dividiendo 
 --	el total de dinero apostado entre lo apostado a ese caballo y se multiplica el resultado por 0.2
+ 
+create function [Calcular Premio2] (@IDCaballo as smallint, @IDCarrera as smallint)
+returns decimal (4,1) as
+	begin 
+		declare @Premio as decimal (4,1)
+		if(dbo.FnTotalApostadoCC(@IDCaballo, @IDCarrera)=0)
+			begin 
+				set @Premio=100
+			end
+		else
+			begin
+				select @Premio=(dbo.[TotalDineroApostado](@IDCarrera)/dbo.TotalApostadoCC(@IDCaballo, @IDCarrera))*0.2
+				from LTApuestas as A
+				inner join LTCaballosCarreras as CC on A.IDCaballo=CC.IDCaballo and A.IDCarrera=CC.IDCarrera
+				where @IDCaballo=CC.IDCaballo and @IDCarrera=CC.IDCarrera
+			end
+		return @Premio
+	end
+go
 
+declare @IDCaballo as  smallint
+declare @IDCarrera as  smallint
+
+set @IDCaballo=20
+set @IDCarrera=4
+
+select  dbo.[Calcular Premio2] (@IDCaballo,@IDCarrera)
+go
 --	d.Si a algún caballo no ha apostado nadie tanto el Premio1 como el Premio2 se ponen a 100.
+create function [SinApuesta] (@IDCaballo as smallint, @IDCarrera as smallint)
+returns decimal (4,1) as
+	begin 
+		declare @Premio as decimal (4,1)
+		if(dbo.FnTotalApostadoCC(@IDCaballo, @IDCarrera)=0)
+			begin 
+				set @Premio=100
+			end
+		return @Premio
+	end
+go
+
+declare @IDCaballo as  smallint
+declare @IDCarrera as  smallint
+
+set @IDCaballo=20
+set @IDCarrera=4
+
+select  dbo.[Calcular Premio2] (@IDCaballo,@IDCarrera)
+go
 
 --Crea una función que devuelva una tabla con tres columnas: ID de la apuesta, Premio1 y Premio2.
+
+create function IDPremio1Premio2(@IDCaballo as smallint, @IDCarrera as smallint)
+returns table as 
+	return
+		(
+			select A.ID,dbo.[Calcular Premio1](@IDCaballo,@IDCarrera) as [Premio1],dbo.[Calcular Premio2](@IDCaballo,@IDCarrera) as [Premi2]
+			from LTApuestas as A
+			inner join LTCaballosCarreras as CC on A.IDCaballo=CC.IDCaballo and A.IDCarrera=CC.IDCarrera
+			where @IDCaballo=CC.IDCaballo and @IDCarrera=CC.IDCarrera
+		)
+go
+
+declare @IDCaballo as  smallint
+declare @IDCarrera as  smallint
+
+set @IDCaballo=20
+set @IDCarrera=4
+
+select * from dbo.IDPremio1Premio2 (@IDCaballo,@IDCarrera)
+go
 
 --Debes usar la función del Ejercicio 2. Si lo estimas oportuno puedes crear otras funciones para realizar parte de los cálculos.
 
