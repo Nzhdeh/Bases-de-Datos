@@ -251,6 +251,32 @@ go
 --Queremos que aparezcan 8 filas con las posiciones de la 1 a la 8. Si el caballo nunca ha finalizado 
 --en alguna de esas posiciones, aparecerá el valor 0 en la columna NumVeces.
 
+alter function FnPalmares (@IDCaballo as smallint, @FechaInicio as date, @FechaFin as date)
+	returns table as
+		return
+			(
+				select isnull(cast(CC.Posicion as varchar(20)),'No terminado') as [Posiciones], count(CC.Posicion) as [NumVeces] from LTCaballosCarreras as CC
+				inner join LTCarreras as C on CC.IDCarrera=C.ID
+				where CC.IDCaballo=@IDCaballo and C.Fecha between @FechaInicio and @FechaFin
+				group by CC.Posicion
+			)
+go
+
+declare @IDCaballo as  smallint
+declare @FechaInicio as date
+declare @FechaFin as date
+
+set @IDCaballo=2
+set @FechaInicio='20110228'
+set @FechaFin='20180910'
+
+select * from dbo.FnPalmares (@IDCaballo,@FechaInicio,@FechaFin)
+go
+
+select * from LTCaballosCarreras
+where IDCaballo=2 
+
+
 --6.Crea una función FnCarrerasHipodromo que nos devuelva las carreras celebradas en un hipódromo en un rango de fechas.
 --La función recibirá como parámetros el nombre del hipódromo y la fecha de inicio y fin del intervalo 
 --y nos devolverá una tabla con las siguientes columnas: Fecha de la carrera, número de orden, 
