@@ -18,7 +18,6 @@ go
 create function FnCarrerasCaballo (@FechaIni as date, @FechaFin as date )
 	returns table as 
 		return
-
 			(
 				select C.ID,C.Nombre,C.Sexo,C.FechaNacimiento,count(*) as [Numero de carreras] from LTCaballos as C
 				inner join LTCaballosCarreras as CC on C.ID=CC.IDCaballo
@@ -255,7 +254,7 @@ alter function FnPalmares (@IDCaballo as smallint, @FechaInicio as date, @FechaF
 	returns table as
 		return
 			(
-				select isnull(cast(CC.Posicion as varchar(20)),'No terminado') as [Posiciones], count(CC.Posicion) as [NumVeces] from LTCaballosCarreras as CC
+				select isnull(cast(CC.Posicion as varchar(12)),'No terminado') as [Posiciones], count(CC.Posicion) as [NumVeces] from LTCaballosCarreras as CC
 				inner join LTCarreras as C on CC.IDCarrera=C.ID
 				where CC.IDCaballo=@IDCaballo and C.Fecha between @FechaInicio and @FechaFin
 				group by CC.Posicion
@@ -275,12 +274,60 @@ go
 
 select * from LTCaballosCarreras
 where IDCaballo=2 
+go
 
 
+-------------------------------------Version mejorada---------------------------------------------------
+
+declare @Posiciones table
+(
+	Pos varchar(12)	
+)
+declare @FechaInicio as date
+declare @FechaFin as date
+declare @IDCaballo as smallint 
+
+create function FnPalmares2 (@IDCaballo as smallint, @FechaInicio as date, @FechaFin as date)
+	returns table as
+		return
+			(
+				insert into @Posiciones values ('1'),('2'),('3'),('4'),('5'),('6'),('7'),('8'),('No terminado')
+				
+				select isnull(cast(P.Pos as varchar(12)),'No terminado') as [Posiciones], count(CC.Posicion) as [NumVeces] from LTCaballosCarreras as CC
+				inner join LTCarreras as C on CC.IDCarrera=C.ID AND CC.IDCaballo=@IDCaballo and C.Fecha between @FechaInicio and @FechaFin
+				Right JOIN @Posiciones As P ON isnull(cast(CC.Posicion as varchar(12)),'No terminado') = P.Pos
+				group by P.Pos
+			)
+go
+
+declare @IDCaballo as  smallint
+declare @FechaInicio as date
+declare @FechaFin as date
+
+set @IDCaballo=2
+set @FechaInicio='20110228'
+set @FechaFin='20180910'
+
+select * from dbo.FnPalmares2 (@IDCaballo,@FechaInicio,@FechaFin)
+go
+
+
+select * from LTCarreras
 --6.Crea una función FnCarrerasHipodromo que nos devuelva las carreras celebradas en un hipódromo en un rango de fechas.
 --La función recibirá como parámetros el nombre del hipódromo y la fecha de inicio y fin del intervalo 
 --y nos devolverá una tabla con las siguientes columnas: Fecha de la carrera, número de orden, 
 --numero de apuestas realizadas, número de caballos inscritos, número de caballos que la finalizaron y nombre del ganador.
 
+create function FnCarrerasHipodromo (@Hipodromo as varchar (30), @FechaInicio as date, @FechaFin as date)
+	returns table as
+		return
+			(
+				select C.Fecha,C.NumOrden,count(*) as [Numero de apuestas],count (*) as [Numero de caballos] from LTCarreras as C
+				inner join LTApuestas as A on C.ID=A.IDCarrera
+				inner join LTCaballos as CB on A.IDCaballo=CB.ID
+				inner join LTCaballosCarreras as CC on CB.ID=CC.IDCaballo
+				where @Hipodromo=C.Hipodromo and C.Fecha between @FechaInicio and @FechaFin
+			)
+go
 --7.Crea una función FnObtenerSaldo a la que pasemos el ID de un jugador y una fecha y nos devuelva su saldo en esa fecha. 
 --Si se omite la fecha, se devolverá el saldo actual
