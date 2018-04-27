@@ -327,7 +327,20 @@ create function FnCarrerasHipodromo (@Hipodromo as varchar (30), @FechaInicio as
 				inner join LTCaballos as CB on A.IDCaballo=CB.ID
 				inner join LTCaballosCarreras as CC on CB.ID=CC.IDCaballo
 				where @Hipodromo=C.Hipodromo and C.Fecha between @FechaInicio and @FechaFin
+				group by  C.Fecha,C.NumOrden
 			)
 go
+
+declare @Hipodromo as varchar (30)
+declare @FechaInicio as date
+declare @FechaFin as date
+
+set @Hipodromo='Costa del Sol'
+set @FechaInicio='20110228'
+set @FechaFin='20180910'
+
+select * from dbo.FnCarrerasHipodromo (@Hipodromo,@FechaInicio,@FechaFin)
+go
+select * from LTCarreras
 --7.Crea una función FnObtenerSaldo a la que pasemos el ID de un jugador y una fecha y nos devuelva su saldo en esa fecha. 
 --Si se omite la fecha, se devolverá el saldo actual
