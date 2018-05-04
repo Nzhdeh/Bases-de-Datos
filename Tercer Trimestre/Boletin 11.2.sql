@@ -13,13 +13,16 @@ create procedure DarDeAltaJugador
 	@Direccion as varchar (50),
 	@Telefono as char (9),
 	@Ciudad as varchar (20),
-	@CantApostado decimal(5,2)
+	@CantApostado smallmoney
 
 as
 
 begin
 	insert into LTJugadores (ID,Nombre,Apellidos,Direccion,Telefono,Ciudad)
 	values(@ID,@Nombre,@Apellidos,@Direccion,@Telefono,@Ciudad)
+
+	insert into LTApuntes(IDJugador,Orden,Fecha,Importe,Saldo,Concepto)
+	values(@ID,241,'20180504',@CantApostado,150,'Apuesta 1')
 end
 
 go
@@ -36,6 +39,12 @@ execute DarDeAltaJugador @ID = 45,
 select * from LTJugadores
 where ID=45
 
+select * from LTApuntes
+where Orden=241
+
+go
+--delete from LTApuntes
+--where Orden=241
 --delete from LTJugadores
 --where ID=45
 
@@ -45,6 +54,44 @@ where ID=45
 --haber dos caballos con el mismo número en una carrera. Si la carrera no existe, si hay ocho caballos ya inscritos o si el caballo 
 --no existe o está ya inscrito en esa carrera, el parámetro de salida devolverá NULL.
 
+create procedure InscribirCaballo
+	
+		@IDCaballo as smallint,
+		@IDCarrera as smallint,
+		@NumeroAsignado as tinyint output
+
+as
+
+begin 
+	insert into LTCaballosCarreras(IDCaballo,IDCarrera,Numero,Posicion,Premio1,Premio2)
+	values(@IDCaballo,@IDCarrera,round(((99-1-1)*rand()+1),0),null,2.5,5)
+
+	select @NumeroAsignado=
+		
+		(
+			case 
+				when CA.ID=null then @NumeroAsignado=null
+				when (select count(IDCaballo) from LTCaballosCarreras
+						where ) then @NumeroAsignado=null
+			end
+		)
+
+	 from LTCaballos as C
+	inner join LTCaballosCarreras as CC on C.ID=CC.IDCaballo
+	inner join LTCarreras as CA on CC.IDCarrera=CA.ID
+end
+
+go
+
+declare @IDCaballo as smallint =1
+declare @IDCarrera as smallint =2
+declare @NumeroAsignado as tinyint
+
+execute InscribirCaballo @IDCaballo,@IDCarrera,@NumeroAsignado output
+
+select * from LTCaballosCarreras
+where Numero=1
+go
 --3.Añade a la tabla LTJugadores una nueva columna llamada LimiteCredito de tipo SmallMoney con el valor por defecto 50. 
 --Este valor indicará el máximo saldo negativo que se permite al jugador. El saldo del jugador más el valor de esa columna 
 --no puede ser nunca inferior a 0.
