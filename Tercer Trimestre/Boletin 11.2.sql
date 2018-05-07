@@ -59,10 +59,40 @@ create procedure InscribirCaballo
 		@IDCaballo as smallint,
 		@IDCarrera as smallint,
 		@NumeroAsignado as tinyint output
-
 as
 
 begin 
+
+	declare @var as smallint
+	declare @inscrito as bit
+	declare @caballoExiste as bit
+
+	set @var=(select count(IDCaballo) from LTCaballosCarreras
+						where @IDCarrera=IDCarrera)
+
+	if exists (select * from LTCaballosCarreras
+				where @IDCarrera=IDCarrera and @IDCaballo=IDCaballo)
+	begin 
+		set @inscrito = 1
+	end
+
+	else
+	begin 
+		set @inscrito = 0
+	end
+	
+	if exists (select * from LTCaballosCarreras
+				where @IDCarrera=IDCarrera and @IDCaballo=IDCaballo
+				)
+	begin 
+		set @caballoExiste = 1
+	end
+
+	else
+	begin 
+		set @caballoExiste = 0
+	end
+
 	insert into LTCaballosCarreras(IDCaballo,IDCarrera,Numero,Posicion,Premio1,Premio2)
 	values(@IDCaballo,@IDCarrera,round(((99-1-1)*rand()+1),0),null,2.5,5)
 
@@ -70,9 +100,10 @@ begin
 		
 		(
 			case 
-				when CA.ID=null then @NumeroAsignado=null
-				when (select count(IDCaballo) from LTCaballosCarreras
-						where ) then @NumeroAsignado=null
+				when CA.ID is null then null
+				when @var>=8  then null
+				when @inscrito=1 then null 
+				when @caballoExiste=1 then null
 			end
 		)
 
@@ -83,7 +114,7 @@ end
 
 go
 
-declare @IDCaballo as smallint =1
+declare @IDCaballo as smallint =99
 declare @IDCarrera as smallint =2
 declare @NumeroAsignado as tinyint
 
@@ -92,6 +123,8 @@ execute InscribirCaballo @IDCaballo,@IDCarrera,@NumeroAsignado output
 select * from LTCaballosCarreras
 where Numero=1
 go
+
+
 --3.Añade a la tabla LTJugadores una nueva columna llamada LimiteCredito de tipo SmallMoney con el valor por defecto 50. 
 --Este valor indicará el máximo saldo negativo que se permite al jugador. El saldo del jugador más el valor de esa columna 
 --no puede ser nunca inferior a 0.
