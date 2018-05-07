@@ -104,7 +104,8 @@ begin
 				when @var>=8  then null
 				when @inscrito=1 then null 
 				when @caballoExiste=1 then null
-			end
+				else @NumeroAsignado
+			end 
 		)
 
 	 from LTCaballos as C
@@ -144,6 +145,17 @@ go
 --El saldo del jugador no es suficiente				10
 
 --Ninguna de las anteriores							0
+go
+alter table LTJugadores add LimiteCredito smallmoney 
+go
+alter table LTJugadores add constraint DF_LimiteCredito default 50 for LimiteCredito
+go
+
+update LTJugadores 
+set LimiteCredito = 50
+
+go
+select * from LTJugadores
 
 --4.Algunas veces se bonifica a los jugadores que más apuestan reglándoles saldo extra. Escribe un procedimiento AplicarBonificacion 
 --que reciba como parámetros un rango de fechas, la cantidad mínima apostada para tener derecho a la bonificación y la cuantía de la bonificación. 
