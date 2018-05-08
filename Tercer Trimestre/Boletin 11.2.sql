@@ -156,6 +156,71 @@ set LimiteCredito = 50
 
 go
 select * from LTJugadores
+go
+
+alter procedure GrabarApuesta
+
+		@IDJugador as int,
+		@IDCarrera as smallint,
+		@IDCaballo as smallint,
+		@Importe as smallmoney
+as 
+
+	begin 
+		declare	@codigoTerminacion as tinyint
+		declare @existeCaballoCarrera as bit
+
+		if exists (select * from LTCaballosCarreras
+					where @IDCarrera=IDCarrera and @IDCaballo=IDCaballo
+					)
+			begin 
+				set @existeCaballoCarrera=1
+			end
+
+		else
+			begin 
+				set @existeCaballoCarrera=0
+			end
+
+		select @CodigoTerminacion=
+		(
+			case
+				when C.ID is null then 2
+				when C.Fecha<CURRENT_TIMESTAMP then 3
+				when @existeCaballoCarrera=0 then 5
+				when Ap.Saldo<1 then 10
+				else 0
+			end
+		) 
+		from LTApuestas as A
+			inner join LTCarreras as C on A.IDCarrera=C.ID
+			inner join LTJugadores as J on A.IDJugador=J.ID
+			inner join LTApuntes as AP on J.ID=AP.IDJugador
+		where @IDJugador=J.ID and @IDCarrera=C.ID and @IDCaballo=A.IDCaballo and @Importe=A.Importe
+
+		return @codigoTerminacion
+
+		if @codigoTerminacion=0
+
+		begin 
+			--hay que insertar la apuesta
+		end
+	end
+go
+
+declare @IDJugador as int =1
+declare	@IDCarrera as smallint =1
+declare	@IDCaballo as smallint=1
+declare	@Importe as smallmoney =50
+declare @Codigo as tinyint
+
+execute @Codigo= GrabarApuesta @IDJugador,@IDCarrera,@IDCaballo, @Importe
+
+select @Codigo
+
+--print @Codigo --el resultado esta en mensajes
+
+select * from LTCarreras
 
 --4.Algunas veces se bonifica a los jugadores que más apuestan reglándoles saldo extra. Escribe un procedimiento AplicarBonificacion 
 --que reciba como parámetros un rango de fechas, la cantidad mínima apostada para tener derecho a la bonificación y la cuantía de la bonificación. 
