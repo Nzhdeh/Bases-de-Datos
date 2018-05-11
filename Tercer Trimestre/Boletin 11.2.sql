@@ -18,8 +18,11 @@ create procedure DarDeAltaJugador
 as
 
 begin
+	declare @Codigo as int 
+	select top 1 @Codigo=ID+1 from LTJugadores	--calcula el ultimo jugador y le suma 1
+
 	insert into LTJugadores (ID,Nombre,Apellidos,Direccion,Telefono,Ciudad)
-	values(@ID,@Nombre,@Apellidos,@Direccion,@Telefono,@Ciudad)
+	values(@Codigo,@Nombre,@Apellidos,@Direccion,@Telefono,@Ciudad)
 
 	insert into LTApuntes(IDJugador,Orden,Fecha,Importe,Saldo,Concepto)
 	values(@ID,241,'20180504',@CantApostado,150,'Apuesta 1')
@@ -133,18 +136,18 @@ go
 --el caballo y el importe a apostar y devolverá con return un código de terminación según la siguiente tabla:
 
 
---Circunstancia										valor
+--Circunstancia								|		valor
 
 
---La carrera no existe								2
+--La carrera no existe						|		2
 			
---La carrera ya se ha disputado						3
+--La carrera ya se ha disputado				|		3
 
---El caballo no corre en esa carrera				5
+--El caballo no corre en esa carrera		|		5
 
---El saldo del jugador no es suficiente				10
+--El saldo del jugador no es suficiente		|		10
 
---Ninguna de las anteriores							0
+--Ninguna de las anteriores					|		0
 go
 alter table LTJugadores add LimiteCredito smallmoney 
 go
@@ -221,13 +224,55 @@ select @Codigo
 --print @Codigo --el resultado esta en mensajes
 
 select * from LTCarreras
-
---4.Algunas veces se bonifica a los jugadores que más apuestan reglándoles saldo extra. Escribe un procedimiento AplicarBonificacion 
+go
+--4.Algunas veces se bonifica a los jugadores que más apuestan regalándoles saldo extra. Escribe un procedimiento AplicarBonificacion 
 --que reciba como parámetros un rango de fechas, la cantidad mínima apostada para tener derecho a la bonificación y la cuantía de la bonificación. 
 --También un parámetro de tipo bit. Si ese parámetro vale 0, la bonificación se entiende como una cantidad de dinero que se suma a todos los que 
 --cumplan los criterios de fecha y cantidad apostada. Si el parámetro vale 1, la bonificación que hay que sumar será igual a un porcentaje del 
 --total apostado entre esas dos fechas. En este segundo caso, el valor de la bonificación no podrá ser superior a 10.
 --El procedimiento debe generar los apuntes que correspondan con el concepto "Bonificación”
+go
+drop function TotalApostado
+go
+create function TotalApostado(@FechaIni as date,@FechaFin as date)--creo esta funcion,para llamarla en el procedimiento
+	returns table as
+		return 
+		(
+			select A.ID,sum(A.Importe) as [Total apostado] from LTApuestas as A
+			inner join LTCarreras as C on A.IDCarrera=C.ID
+			where C.Fecha between @FechaIni and @FechaFin
+			group by A.ID
+		)
+go
+
+declare @FechaIni as date
+declare @FechaFinal as date
+
+set @FechaIni='20000225'
+set @FechaFinal ='20200226'
+
+select * from TotalApostado (@FechaIni,@FechaFinal)
+go
+
+create procedure AplicarBonificacion
+	
+		@ApuestaMinima as double,
+		@FechaIni as date,
+		@FechaFin as date,
+		@CuantiaBonificacion as double
+		
+as
+
+begin
+	declare @Variable as bit
+
+	select @Variable=
+			(
+			case 
+				when then 0
+			)
+	 from LTApuestas
+end
 
 --5.Escribe un procedimiento almacenado que calcule y actualice los valores de las columnas Premio1 y Premio2 de la tabla LTCaballosCarreras. 
 --El procedimiento recibirá un parámetro que será el ID de la carrera y devolverá un código de error en un parametro de salida que valdrá 1 
