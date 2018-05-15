@@ -44,7 +44,7 @@ declare @IDBanda as smallint =99
 declare @FechaDisolucion as date ='02022017'
 
 execute darDeBajaBanda @IDBanda,@FechaDisolucion
-
+go
 
 --Ejercicio 2
 --Escribe una función que reciba como parámetro un año y nos devuelva una tabla indicando cuantas canciones 
@@ -54,6 +54,33 @@ execute darDeBajaBanda @IDBanda,@FechaDisolucion
 --El resultado tendrá cuatro columnas: Estilo, número de interpretaciones de ese estilo en el año anterior, 
 --número de interpretaciones de ese estilo en el año que nos piden y símbolo que indique aumento o disminución.
 --Puedes hacer otras funciones auxiliares a las que llames, pero no declarar vistas.
+create function TemasCantados (@Año as int)
+	returns table as
+		return
+		(
+			select distinct T.IDEstilo,TemasAñoAnterior.[Temas cantados] as [Temas Cantados Año Anterior],count(*) as [Temas cantados] 
+				case 
+					when count(*) - TemasAñoAnterior>0 then '+'
+					when count(T.ID) - TemasAñoAnterior = 0 then '='
+					when count(T.ID) - TemasAñoAnterior < 0 then '-'
+				end
+			
+			from LFTemas as T
+			inner join LFTemasBandasEdiciones as TBE on T.ID=TBE.IDTema
+			inner join LFEdiciones as E on TBE.IDFestival =E.IDFestival and TBE.Ordinal=E.Ordinal 
+			inner join LFEstilos as ES on T.IDEstilo=ES.ID
+			inner join
+					(
+						select ES.Estilo,count(*) as [Temas cantados] from LFTemas as T
+						inner join LFTemasBandasEdiciones as TBE on T.ID=TBE.IDTema
+						inner join LFEdiciones as E on TBE.IDFestival =E.IDFestival and TBE.Ordinal=E.Ordinal
+						inner join LFEstilos as ES on T.IDEstilo=ES.ID
+						where (@Año-1) between year(E.FechaHoraInicio) and year(E.FechaHoraFin)
+						group by ES.Estilo
+					) as TemasAñoAnterior on TemasAñoAnterior.Estilo=ES.Estilo 
+			where (@Año) between year(E.FechaHoraInicio) and year(E.FechaHoraFin)
+			group by T.IDEstilo,TemasAñoAnterior.[Temas cantados]
+		)
 
 --Ejercicio 3
 --Escribe un procedimiento TemaEjecutado y anote en la tabla LFBandasEdiciones que una banda ha interpretado 
@@ -62,6 +89,7 @@ execute darDeBajaBanda @IDBanda,@FechaDisolucion
 --el ordinal de la edición, el ID de una banda y una fecha/hora.
 --Si el tema es nuevo y no está dado de alta en la base de datos, se insertará en la tabla correspondiente. 
 --Si el estilo no existe, también se dará de alta.
+
 --Ejercicio 4
 --Escribe un procedimiento almacenado que actualice la columna caché de la tabla LFBandas de acuerdo a las siguientes reglas:
 --•	Se computarán 105 € por cada miembro activo de la banda
