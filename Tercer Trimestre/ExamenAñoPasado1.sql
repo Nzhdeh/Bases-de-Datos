@@ -101,6 +101,45 @@ select * from TemasCantados (2007)
 --Si el tema es nuevo y no está dado de alta en la base de datos, se insertará en la tabla correspondiente. 
 --Si el estilo no existe, también se dará de alta.
 
+GO
+CREATE PROCEDURE TemaEjecutado
+	@Titulo VARCHAR(120)
+	,@IDAutor INT
+	,@Estilo VARCHAR(30)
+	,@Duracion TIME(7)
+	,@IDFestival INT
+	,@Ordinal TINYINT
+	,@IDBanda SMALLINT
+AS
+BEGIN
+	--SI NO EXISTE EL ESTILO LO INSERTAMOS
+	IF NOT EXISTS(SELECT Estilo FROM LFEstilos WHERE Estilo = @Estilo)
+		BEGIN
+			INSERT INTO LFEstilos (ID, Estilo)
+			VALUES((SELECT MAX(ID) + 1 FROM LFEstilos), @Estilo)
+		END
+	
+	--SI NO EXISTE EL TEMA LO INSERTAMOS
+	IF NOT EXISTS(SELECT Titulo FROM LFTemas WHERE Titulo = @Titulo)
+		BEGIN
+			INSERT INTO LFTemas (ID, Titulo, IDAutor, IDEstilo, Duracion)
+			VALUES(NEWID(), @Titulo, @IDAutor, (SELECT ID FROM LFEstilos WHERE Estilo = @Estilo), @Duracion)
+		END
+
+	INSERT INTO LFTemasBandasEdiciones (IDBanda, IDFestival, Ordinal, IDTema)
+	VALUES (@IDBanda, @IDFestival, @Ordinal, (SELECT ID FROM LFTemas WHERE Titulo = @Titulo))
+END
+GO
+
+BEGIN TRANSACTION
+--un tema que no exista
+EXECUTE TemaEjecutado 'Mi estrella Blanca', 1, 'Flamenco', '04:20', 5, 3, 1
+--un estilo y un tema que no exista
+EXECUTE TemaEjecutado 'Palabras de Papel', 1, 'TecnoFlamenco', '04:20', 5, 3, 1
+--todo existe
+EXECUTE TemaEjecutado 'Lagartija solidaria', 11, 'Hip-Hop', '02:40', 5, 3, 11
+ROLLBACK TRANSACTION
+
 --Ejercicio 4
 --Escribe un procedimiento almacenado que actualice la columna caché de la tabla LFBandas de acuerdo a las siguientes reglas:
 --•	Se computarán 105 € por cada miembro activo de la banda
