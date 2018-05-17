@@ -130,6 +130,8 @@ rollback
 
 --SET IDENTITY_INSERT CLPedidos ON  --para desactivar el identity temporalmente
 --SET IDENTITY_INSERT CLPedidos OFF	--para volver a activarlo
+--select isnull(cast(CC.Posicion as varchar(12)),'No terminado') as [Posiciones], count(CC.Posicion) as [NumVeces] from LTCaballosCarreras as CC
+
 
 --create function [SinApuesta] (@IDCaballo as smallint, @IDCarrera as smallint)
 --returns decimal (4,1) as
