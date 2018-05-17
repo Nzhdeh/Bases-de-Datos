@@ -31,3 +31,97 @@ go
 declare @@VariableTipoTablla table(columna1 int,columna2 int)
 
 select * from @@VariableTipoTablla
+
+go
+
+---------------------------------------------------------------------------------------------------------------
+--prototipo: create function CLPedidosCamarers (@FechaIni as date, @FechaFin as date )
+--comentarios: es una funcion inline que sirve para devolver el número de pedidos hechos a un camarer entre dos fechas.
+--precondiciones: las fechas tiene que ser correctas
+--entradas: dos fechas
+--salidas: un numero
+--entr/sal: no hay
+--postcondiciones: se devolverá el ID de camarers, nombre, apellidos, telefono y número de pedidos atendidos.
+---------------------------------------------------------------------------------------------------------------
+create function CLPedidosCamarers (@FechaIni as date, @FechaFin as date )
+	returns table as 
+		return
+			(
+				select C.ID,C.Nombre,C.Apellidos,C.Telefono,count(*) as [Numero de pedidos] from CLCamarers as C
+				inner join CLPedidos as P on C.ID=P.IDCamarer
+				where P.Fecha between @FechaIni and @FechaFin
+				group by C.ID,C.Nombre,C.Apellidos,C.Telefono
+			)
+go
+
+declare @FechaInicial as date
+declare @FechaFinal as date
+
+set @FechaInicial='20150101'
+set @FechaFinal ='20190430'
+
+select * from CLPedidosCamarers (@FechaInicial,@FechaFinal)
+
+go
+
+--las veces que un cliente visita cada establecimiento
+
+create function CLVecesVisitadosEstablecimiento (@IDCliente as int,@IDEstablecimiento as smallint)
+	returns table as
+		return
+		(
+			select C.ID,C.Nombre,C.Apellidos,count(P.IDEstablecimiento) as [Veces visitados] from CLClientes as C
+			inner join CLPedidos as P on C.ID=P.IDCliente
+			where C.ID=@IDCliente and P.IDEstablecimiento=@IDEstablecimiento
+			group by C.ID,C.Nombre,C.Apellidos
+		)
+go
+
+declare @IDCliente as int
+declare @IDEstablecimiento as smallint
+
+set @IDCliente=1
+set @IDEstablecimiento =1
+
+select * from CLVecesVisitadosEstablecimiento (@IDCliente,@IDEstablecimiento)
+go
+
+--un procedimiento que incerta un camarer y le asigna un pedido
+
+alter procedure DarDeAltaCamarero
+
+	@ID as smallint,
+	@Nombre as varchar (20),
+	@Apellidos as varchar (30),
+	@Telefono as char (9),
+	@IDEstablecimiento smallint
+
+as
+
+begin
+	begin transaction
+		declare @Codigo as int 
+		declare @CodigoPedido as bigint
+		select @Codigo = max(ID) +1  from CLCamarers
+		select @CodigoPedido=max(ID)+1 from CLPedidos	--calcula el ultimo id y le suma 1
+
+		insert into CLCamarers (ID,Nombre,Apellidos,Telefono,IDEstablecimiento)
+		values(@Codigo,@Nombre,@Apellidos,@Telefono,@IDEstablecimiento)
+
+		insert into CLPedidos(ID,Fecha,IDCliente,IDEstablecimiento,IDCamarer,Importe)
+		values(1,'20180504',1,@IDEstablecimiento,@Codigo,10.20)--en el id pongo 1 porque no hay ninguno sino habia que poner @CodigoPedidos
+	commit
+end
+
+go
+
+begin transaction
+execute DarDeAltaCamarero @ID = 45,
+						  @Nombre = 'Nzhdeh',
+						  @Apellidos = 'Yeghiazaryan',
+						  @Telefono = '123456789',
+						  @IDEstablecimiento = 1
+rollback
+
+--SET IDENTITY_INSERT CLPedidos ON  --para desactivar el identity temporalmente
+--SET IDENTITY_INSERT CLPedidos OFF	--para volver a activarlo
