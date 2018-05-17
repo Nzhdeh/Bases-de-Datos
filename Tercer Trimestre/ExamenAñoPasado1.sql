@@ -8,44 +8,52 @@ go
 --Escribe un procedimiento almacenado que de de baja a una banda, actualizando su fecha de disolución y 
 --la fecha de abandono de todos sus componentes actuales. La fecha de disolución y el ID de la banda se 
 --pasarán como parámetros. Si no se especifica fecha, se tomará la actual.
+
+--SET IDENTITY_INSERT LFBandas ON  --para desactivar el identity temporalmente
+--SET IDENTITY_INSERT LFBandas OFF	--para volver a activarlo
 create procedure darDeBajaBanda
 
 		@FechaDicsolicion as date = null,
-		@IDBanda as smallint
+		@IDBanda as int
 as
 begin 
+	begin transaction
+		if(@FechaDicsolicion is null)
+			begin
+				update LFBandas
+				set FechaDisolucion= cast(current_timestamp as date)
+				where Id=@IDBanda 
 
-	if(@FechaDicsolicion is null)
-		begin
-			update LFBandas
-			set FechaDisolucion= current_timestamp
-			where Id=@IDBanda 
+				update LFMusicosBandas
+				set FechaAbandono= cast(current_timestamp as date)
+				where IDBanda=@IDBanda 
+			end
+		else
+			begin
+				update LFBandas
+				set FechaDisolucion= @FechaDicsolicion
+				where Id=@IDBanda 
 
-			update LFMusicosBandas
-			set FechaAbandono= current_timestamp
-			where Id=@IDBanda 
-		end
-	else
-		begin
-			update LFBandas
-			set FechaDisolucion= @FechaDicsolicion
-			where Id=@IDBanda 
-
-			update LFMusicosBandas
-			set FechaAbandono= @FechaDicsolicion
-			where Id=@IDBanda
-		end
+				update LFMusicosBandas
+				set FechaAbandono= @FechaDicsolicion
+				where IDBanda=@IDBanda
+			end
+		commit
 end
 
 go
+set dateformat ymd
 
 begin transaction
-declare @IDBanda as smallint =99
-declare @FechaDisolucion as date ='02022017'
-
-execute darDeBajaBanda @IDBanda,@FechaDisolucion
+--declare @IDBanda as int =1
+--declare @FechaDisolucion as date ='20140930'
+--con fecha
+--execute darDeBajaBanda 1,'2016-05-04'
+--sin fecha
+execute darDeBajaBanda 1
+rollback
 go
-
+select * from LFBandas
 --Ejercicio 2
 --Escribe una función que reciba como parámetro un año y nos devuelva una tabla indicando cuantas canciones 
 --(temas) de cada estilo se han cantado en los distintos festivales celebrados a lo largo de ese año, el mismo 
@@ -54,16 +62,17 @@ go
 --El resultado tendrá cuatro columnas: Estilo, número de interpretaciones de ese estilo en el año anterior, 
 --número de interpretaciones de ese estilo en el año que nos piden y símbolo que indique aumento o disminución.
 --Puedes hacer otras funciones auxiliares a las que llames, pero no declarar vistas.
+go
 create function TemasCantados (@Año as int)
 	returns table as
 		return
 		(
-			select distinct T.IDEstilo,TemasAñoAnterior.[Temas cantados] as [Temas Cantados Año Anterior],count(*) as [Temas cantados] 
+			select distinct T.IDEstilo,TemasAñoAnterior.[Temas cantados] as [Temas Cantados Año Anterior],count(*) as [Temas cantados], 
 				case 
-					when count(*) - TemasAñoAnterior>0 then '+'
-					when count(T.ID) - TemasAñoAnterior = 0 then '='
-					when count(T.ID) - TemasAñoAnterior < 0 then '-'
-				end
+					when count(*) - [Temas cantados]>0 then '+'
+					when count(T.ID) - [Temas cantados] = 0 then '='--UNA COLUMNA MAS
+					when count(T.ID) - [Temas cantados] < 0 then '-'
+				end as [Simbolos]
 			
 			from LFTemas as T
 			inner join LFTemasBandasEdiciones as TBE on T.ID=TBE.IDTema
@@ -81,6 +90,8 @@ create function TemasCantados (@Año as int)
 			where (@Año) between year(E.FechaHoraInicio) and year(E.FechaHoraFin)
 			group by T.IDEstilo,TemasAñoAnterior.[Temas cantados]
 		)
+go
+select * from TemasCantados (2007)
 
 --Ejercicio 3
 --Escribe un procedimiento TemaEjecutado y anote en la tabla LFBandasEdiciones que una banda ha interpretado 
