@@ -28,6 +28,11 @@ create table ##PedidosCancelados --tablas temporales
 )
 go
 
+declare @PedidoCancelado table
+(
+	IDPedido bigint not null	
+)
+go
 declare @@VariableTipoTablla table(columna1 int,columna2 int)
 
 select * from @@VariableTipoTablla
@@ -125,3 +130,85 @@ rollback
 
 --SET IDENTITY_INSERT CLPedidos ON  --para desactivar el identity temporalmente
 --SET IDENTITY_INSERT CLPedidos OFF	--para volver a activarlo
+
+--create function [SinApuesta] (@IDCaballo as smallint, @IDCarrera as smallint)
+--returns decimal (4,1) as
+--	begin 
+--		declare @Premio as decimal (4,1)
+--		if(dbo.FnTotalApostadoCC(@IDCaballo, @IDCarrera)=0)
+--			begin 
+--				set @Premio=100
+--			end
+--		return @Premio
+--	end
+--go
+
+
+
+/***********************************************************************************************************************/
+--create procedure InscribirCaballo
+	
+--		@IDCaballo as smallint,
+--		@IDCarrera as smallint,
+--		@NumeroAsignado as tinyint output
+--as
+
+--begin 
+
+--	declare @var as smallint
+--	declare @inscrito as bit
+--	declare @caballoExiste as bit
+
+--	set @var=(select count(IDCaballo) from LTCaballosCarreras
+--						where @IDCarrera=IDCarrera)
+
+--	if exists (select * from LTCaballosCarreras
+--				where @IDCarrera=IDCarrera and @IDCaballo=IDCaballo)
+--	begin 
+--		set @inscrito = 1
+--	end
+
+--	else
+--	begin 
+--		set @inscrito = 0
+--	end
+	
+--	if exists (select * from LTCaballosCarreras
+--				where @IDCarrera=IDCarrera and @IDCaballo=IDCaballo
+--				)
+--	begin 
+--		set @caballoExiste = 1
+--	end
+
+--	else
+--	begin 
+--		set @caballoExiste = 0
+--	end
+
+--	insert into LTCaballosCarreras(IDCaballo,IDCarrera,Numero,Posicion,Premio1,Premio2)
+--	values(@IDCaballo,@IDCarrera,round(((99-1-1)*rand()+1),0),null,2.5,5)
+
+--	select @NumeroAsignado=
+		
+--		(
+--			case 
+--				when CA.ID is null then null
+--				when @var>=8  then null
+--				when @inscrito=1 then null 
+--				when @caballoExiste=1 then null
+--				else @NumeroAsignado
+--			end 
+--		)
+
+--	 from LTCaballos as C
+--	inner join LTCaballosCarreras as CC on C.ID=CC.IDCaballo
+--	inner join LTCarreras as CA on CC.IDCarrera=CA.ID
+--end
+
+--go
+
+--declare @IDCaballo as smallint =99
+--declare @IDCarrera as smallint =2
+--declare @NumeroAsignado as tinyint
+
+--execute InscribirCaballo @IDCaballo,@IDCarrera,@NumeroAsignado output
