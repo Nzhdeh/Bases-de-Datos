@@ -89,6 +89,8 @@ set @IDCliente=1
 set @IDEstablecimiento =1
 
 select * from CLVecesVisitadosEstablecimiento (@IDCliente,@IDEstablecimiento)
+
+
 go
 
 --un procedimiento que incerta un camarer y le asigna un pedido
@@ -214,3 +216,55 @@ rollback
 --declare @NumeroAsignado as tinyint
 
 --execute InscribirCaballo @IDCaballo,@IDCarrera,@NumeroAsignado output
+
+
+--create function CapcularPrecioCartaVinos()
+--	returns money as
+--		begin
+--			declare @Precio as money
+--			select @Precio=(CV.PVP*PV.Cantidad) from CLCartaVinos as CV
+--			inner join CLPedidosVinos as PV on CV.IDVino=PV.IDVino
+--			return @Precio
+--		end
+--go
+
+--create function CapcularPrecioCartaPlatosTapas()
+--	returns money as
+--		begin
+--			declare @Precio as money
+--			select @Precio=(CP.PVPTapa*Pp.CantidadTapas) from CLCartaPlatos as CP
+--			inner join CLPedidosPlatos as PP on CP.IDPlato=PP.IDPlato
+--			return @Precio
+--		end
+--go
+
+--create function CapcularPrecioCartaPlatosMedia()
+--	returns money as
+--		begin
+--			declare @Precio as money
+--			select @Precio=(CP.PVPMedia*Pp.CantidadMedias) from CLCartaPlatos as CP
+--			inner join CLPedidosPlatos as PP on CP.IDPlato=PP.IDPlato
+--			return @Precio
+--		end
+--go
+
+--create function CapcularPrecioCartaPlatosRacion()
+--	returns money as
+--		begin
+--			declare @Precio as money
+--			select @Precio=(CP.PVPRacion*Pp.CantidadRaciones) from CLCartaPlatos as CP
+--			inner join CLPedidosPlatos as PP on CP.IDPlato=PP.IDPlato
+--			return @Precio
+--		end
+--go
+
+
+--create function CapcularPrecioComplementos()
+--	returns money as
+--		begin
+--			declare @Precio as money
+--			select @Precio=(C.Importe*PC.Cantidad) from CLComplementos as C
+--			inner join CLPedidosComplementos as PC on C.ID=PC.IDComplemento
+--			return @Precio
+--		end
+--go
