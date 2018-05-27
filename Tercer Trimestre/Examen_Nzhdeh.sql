@@ -20,6 +20,37 @@ go
 /**he calculado los precios de CLCartaVinos y CLCartaPlatos,
 porque ya lo habia hecho antes de que nos lo dijeras que se podia hace de otra forma**/
 
+
+create function Precios()
+returns table as
+	return
+	(
+		select Importe from CLPedidos
+	)
+
+go
+
+select * from Precios()
+go
+
+create function CalcularImporte()
+returns table as
+	return
+	(
+		declare @Total as money
+
+		select (((CP.PVPMedia*PP.CantidadMedias)+(CP.PVPRacion*PP.CantidadRaciones)+(CP.PVPTapa*PP.CantidadTapas))+(CV.PVP*PV.Cantidad)+(C.Importe*PC.Cantidad)) as PrecioTotal
+			from CLComplementos as C
+			inner join CLPedidosComplementos as PC on C.ID=PC.IDComplemento
+			inner join CLPedidos as P on PC.IDPedido=P.ID 
+			inner join CLEstablecimientos as E on P.IDEstablecimiento=E.ID
+			inner join CLCartaVinos as CV on E.ID=CV.IDEstablecimiento
+			inner join CLCartaPlatos as CP on E.ID=CP.IDEstablecimiento
+			inner join CLPedidosPlatos as PP on CP.IDPlato=PP.IDPlato
+			inner join CLPedidosVinos as PV on CV.IDVino=PV.IDVino
+			where P.Importe is null
+	)
+
 alter procedure ActualizarPrecios
 		
 			@IDPedido as bigint
