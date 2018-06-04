@@ -1,5 +1,27 @@
 use ChiringLeo
 go
+
+
+
+select * from CLAlergenos
+select * from CLCamarers
+select * from CLCartaPlatos
+select * from CLCartaVinos
+select * from CLClientes
+select * from CLComplementos
+select * from CLEstablecimientos
+select * from CLPedidos
+select * from CLPedidosComplementos
+select * from CLPedidosPlatos
+select * from CLPedidosVinos
+select * from CLPlatos
+select * from CLPLatosAlergenos
+select * from CLPLatosSecciones
+select * from CLSecciones
+select * from CLTiposVino
+select * from CLVinos
+
+go
 --La cadena de chiringuitos ChiringLeo se prepara para comenzar la temporada 2018, y nos ha pedido que desarrollemos 
 --unos artefactos para su base de datos. Nos han facilitado la Base de datos de la temporada anterior (2017) para que hagamos pruebas.
 
@@ -21,17 +43,21 @@ go
 porque ya lo habia hecho antes de que nos lo dijeras que se podia hace de otra forma**/
 
 
-create function Precios()
+alter function PreciosComplementos(@IDPedido as bigint)
 returns table as
 	return
 	(
-		select Importe from CLPedidos
+		select sum(C.Importe*PC.Cantidad) as [Precio Complementos] from CLComplementos as C
+		inner join CLPedidosComplementos as PC on C.ID=PC.IDComplemento
+		where @IDPedido=PC.IDPedido
 	)
 
 go
 
-select * from Precios()
+select * from PreciosComplementos(1)
 go
+
+
 
 create function CalcularImporte()
 returns table as
