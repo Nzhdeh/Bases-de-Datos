@@ -60,13 +60,13 @@ inner join ICHelados as H on P.ID=H.IDPedido
 inner join ICClientes as C on P.IDCliente=C.ID
 inner  join
 			(
-				select Sabor from CasoBaseSabor as CBS
+				select Sabor,CBS.Ciudad,SaborMenosVendido from CasoBaseSabor as CBS
 				inner join 
 						(
 							select Ciudad,min([Numero de sabores]) as SaborMenosVendido from CasoBaseSabor 
 							group by Ciudad
 						)as Saborminimo on CBS.Ciudad=Saborminimo.Ciudad and CBS.[Numero de sabores]=SaborMenosVendido
-			) as PeorSabor on CBS.Sabor=PeorSabor.Sabor
+			) as PeorSabor on H.Sabor=PeorSabor.Sabor
 	group by P.ID,E.Ciudad,C.ID,C.Nombre,C.Apellidos,E.Denominacion,P.Importe,SaborMenosVendido--,TH.Sabor
 having count(P.ID)=PeorSabor.SaborMenosVendido
 
