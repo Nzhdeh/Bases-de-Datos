@@ -76,13 +76,19 @@ having count(P.ID)=PeorSabor.SaborMenosVendido
 --	pedido hay varios helados y varios pueden tener el mismo sabor.
 
 create view SaboresPorEstablecimiento as 
-select H.Sabor,E.Denominacion,count(*) as [Numero de sabores] from ICPedidos as P
+select H.Sabor,E.ID,count(*) as [Numero de sabores] from ICPedidos as P
 inner join ICEstablecimientos as E on P.IDEstablecimiento=E.ID
 inner join ICHelados as H on P.ID=H.IDPedido
-group by H.Sabor,E.Denominacion
+group by H.Sabor,E.ID
+
+
+select Sabor,max([Numero de sabores]) as [MasVendido] from SaboresPorEstablecimiento
+group by Sabor
 
 
 
+select P.ID,H.ID,H.Sabor from ICPedidos as P
+inner join ICHelados as H on P.ID=H.IDPedido
 
 --9. Cifra total de ventas de cada establecimiento en cada estación del año. El invierno va del 21 de diciembre al 21 de marzo, 
 --	la primavera hasta en 21 de junio, el verano termina el 21 de septiembre.
