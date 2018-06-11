@@ -108,6 +108,25 @@ inner join
 --9. Cifra total de ventas de cada establecimiento en cada estación del año. El invierno va del 21 de diciembre al 21 de marzo, 
 --	la primavera hasta en 21 de junio, el verano termina el 21 de septiembre.
 
+select IDEstablecimiento,count(*) as [Total Ventas] from ICPedidos
+--inner join ICEstablecimientos as E on P.IDEstablecimiento=E.ID
+where day(Enviado)>=21 and month(Enviado) in (12,1,2,3) or day(Enviado)<21 and month(Enviado) in (12,1,2,3)
+group by IDEstablecimiento
+
+select IDEstablecimiento,count(*) as [Total Ventas] from ICPedidos
+--inner join ICEstablecimientos as E on P.IDEstablecimiento=E.ID
+where day(Enviado)>=21 and month(Enviado) in (3,4,5,6) or day(Enviado)<21 and month(Enviado) in (3,4,5,6)
+group by IDEstablecimiento
+
+select IDEstablecimiento,count(*) as [Total Ventas] from ICPedidos
+--inner join ICEstablecimientos as E on P.IDEstablecimiento=E.ID
+where day(Enviado)>=21 and month(Enviado) in (6,7,8,9) or day(Enviado)<21 and month(Enviado) in (6,7,8,9)
+group by IDEstablecimiento
+
+select IDEstablecimiento,count(*) as [Total Ventas] from ICPedidos
+--inner join ICEstablecimientos as E on P.IDEstablecimiento=E.ID
+where day(Enviado)>=21 and month(Enviado) in (9,10,11,12) or day(Enviado)<21 and month(Enviado) in (9,10,11,12)
+group by IDEstablecimiento
 
 --10. Porcentaje de helados que usan cada tipo de contenedor
 
@@ -116,6 +135,26 @@ inner join
 --Otras cuestiones
 
 --11. Añade a la tabla clientes una columna de tipo DECIMAL (3,2) llamada TipoDescuento. No admitirá valores nulos y 
---	  su valor por defecto es 0.00. El valor de esta columna indicará el tipo de descuento que hacemos a los clientes en sus pedidos en tanto por uno.
+--	  su valor por defecto es 0.00. El valor de esta columna indicará el tipo de descuento que hacemos a los clientes 
+--en sus pedidos en tanto por uno.
+
+begin transaction
+alter table ICClientes add TipoDescuento DECIMAL (3,2) not null default 0.00
+rollback
+--select * from ICClientes
+
 --12. Añade una restricción para que el valor de esa columna tenga que estar entre 0 y 0.3
+
+alter table ICClientes add constraint CK_TipoDescuento check(TipoDescuento between 0 and 0.3)
+
+--update  ICClientes
+--set TipoDescuento = 5	--probando
+--where ID=1
+
 --13. Rellena la columna sumando 0.02 a todos los clientes que hayan hecho más de tres pedidos durante los meses de octubre a febrero.
+
+create view  PedidosMayoresQueTres as
+select ID,count(*) as [Pedidos] from ICPedidos
+where month(Recibido) in (10,11,12,1,2)/******************************************/
+group by ID
+having count(ID)>3
