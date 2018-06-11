@@ -9,8 +9,8 @@ go
 --Consultas con agregados
 
 --1. Número de veces que se ha pedido cada topping
-select ID,count(*) as [Numero de veces Topping] from ICToppings
-group by ID
+select IDTopping,count(*) as [Numero de veces Topping] from ICHeladosToppings
+group by IDTopping
 
 --2. Número de veces que se ha pedido cada topping cada año
 select T.ID,count(*) as [Numero de veces Topping],year(P.Enviado) as [Año] from ICToppings as T
@@ -32,6 +32,12 @@ order by T.ID
 
 --4. Número de pedidos que incluyen cada topping. OJO: Un pedido puede incluir el mismo topping más de una vez
 
+select distinct HT.IDTopping,count(*) as [Numero de pedidos] from ICPedidos as P
+inner join ICHelados as H on P.ID=H.IDPedido
+inner join ICHeladosToppings as HT on H.ID=HT.IDHelado
+group by HT.IDTopping
+order by HT.IDTopping
+
 
 --5. Número de helados repartidos por cada repartidor en el año 2014.
 select P.IDRepartidor,count(*) as [Numero de repartos por repartidor],year(P.Enviado) as [Año] from ICHelados as H
@@ -47,48 +53,57 @@ order by IDRepartidor
 --7. Pedidos (ID, Nombre y apellidos del cliente, nombre del establecimiento e importe) que incluyan el sabor menos 
 --	vendido de cada ciudad. La ciudad se tomará del establecimiento.
 
-create view CasoBaseSabor as 
-select H.Sabor,E.Ciudad,count(*) as [Numero de sabores] from ICPedidos as P
+create view CasoBaseSabor as --todos los pedidos con que incluyen los sabores
+select P.ID,E.Ciudad,H.Sabor,count(*) as [Numero de sabores] from ICPedidos as P
 inner join ICEstablecimientos as E on P.IDEstablecimiento=E.ID
 inner join ICHelados as H on P.ID=H.IDPedido
---where H.Sabor='Caramelo'
-group by H.Sabor,E.Ciudad
+group by P.ID,E.Ciudad,H.Sabor
 
 
-select C.ID,C.Nombre,C.Apellidos,E.Denominacion,P.Importe,SaborMenosVendido from ICPedidos as P
+select C.ID,C.Nombre,C.Apellidos,E.Denominacion,P.Importe from ICPedidos as P
 inner join ICEstablecimientos as E on P.IDEstablecimiento=E.ID
 inner join ICHelados as H on P.ID=H.IDPedido
 inner join ICClientes as C on P.IDCliente=C.ID
 inner  join
 			(
-				select Sabor,CBS.Ciudad,SaborMenosVendido from CasoBaseSabor as CBS
+				select Sabor,SaborMenosVendido from CasoBaseSabor as CBS
 				inner join 
 						(
-							select Ciudad,min([Numero de sabores]) as SaborMenosVendido from CasoBaseSabor -----------------No esta bien
-							group by Ciudad
+							select ID,Ciudad,min([Numero de sabores]) as SaborMenosVendido from CasoBaseSabor -----------------Preguntar dudas
+							group by ID,Ciudad
 						)as Saborminimo on CBS.Ciudad=Saborminimo.Ciudad and CBS.[Numero de sabores]=SaborMenosVendido
 			) as PeorSabor on H.Sabor=PeorSabor.Sabor
-	group by P.ID,E.Ciudad,C.ID,C.Nombre,C.Apellidos,E.Denominacion,P.Importe,SaborMenosVendido--,TH.Sabor
+	group by P.ID,E.Ciudad,C.ID,C.Nombre,C.Apellidos,E.Denominacion,P.Importe,SaborMenosVendido
 having count(P.ID)=PeorSabor.SaborMenosVendido
 
 
 --8. Sabor más vendido en cada establecimiento. Incluir cuantos pedidos incluyen ese sabor. Ten en cuenta que en un 
 --	pedido hay varios helados y varios pueden tener el mismo sabor.
 
-create view SaboresPorEstablecimiento as 
-select H.Sabor,E.ID,count(*) as [Numero de sabores] from ICPedidos as P
+alter view SaboresPorEstablecimiento as 
+select E.ID,H.Sabor,count(*) as [Numero de sabores] from ICPedidos as P
 inner join ICEstablecimientos as E on P.IDEstablecimiento=E.ID
 inner join ICHelados as H on P.ID=H.IDPedido
-group by H.Sabor,E.ID
+group by E.ID,H.Sabor
 
-
-select Sabor,max([Numero de sabores]) as [MasVendido] from SaboresPorEstablecimiento
-group by Sabor
-
-
-
-select P.ID,H.ID,H.Sabor from ICPedidos as P
+select E.ID,P.ID,PedidosSabores,MasVendido from ICPedidos as P
+inner join ICEstablecimientos as E on P.IDEstablecimiento=E.ID
 inner join ICHelados as H on P.ID=H.IDPedido
+inner join 
+		(
+			select P.ID,MasVendido,count (*) as [PedidosSabores] from ICPedidos as P
+			inner join ICEstablecimientos as E on P.IDEstablecimiento=E.ID
+			inner join ICHelados as H on P.ID=H.IDPedido
+			inner join 
+					(
+						select ID,max([Numero de sabores]) as [MasVendido] from SaboresPorEstablecimiento
+						group by ID
+					) as SaborPorPedido on E.ID=SaborPorPedido.ID
+				group by P.ID,MasVendido
+		) as PedidosQueIncluyenSabores on P.ID=PedidosQueIncluyenSabores.ID
+	group by P.ID,E.ID,PedidosSabores,MasVendido
+--having count(P.ID)=PedidosQueIncluyenSabores.ID		dudas
+
 
 --9. Cifra total de ventas de cada establecimiento en cada estación del año. El invierno va del 21 de diciembre al 21 de marzo, 
 --	la primavera hasta en 21 de junio, el verano termina el 21 de septiembre.
