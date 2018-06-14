@@ -105,7 +105,7 @@ begin
 		begin 
 			begin transaction CalcularPrecioPedidos
 				update CLPedidos
-				set Importe=PrecioComplemento(@Contador)+PreciosDePlatos(@Contador)+PreciosDeVinos(@Contador)
+				set Importe= sum(PrecioComplemento(@Contador)+PreciosDePlatos(@Contador)+PreciosDeVinos(@Contador))
 				where @Contador=ID
 			commit
 		end
