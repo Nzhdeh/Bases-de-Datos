@@ -139,8 +139,9 @@ group by IDEstablecimiento
 --en sus pedidos en tanto por uno.
 
 begin transaction
-alter table ICClientes add TipoDescuento DECIMAL (3,2) not null default 0.00
+alter table ICClientes add TipoDescuento DECIMAL (3,2) not null default 0.00  --se puede poner el valor por defecto directamente o haciendo un constraint
 rollback
+
 --select * from ICClientes
 
 --12. Añade una restricción para que el valor de esa columna tenga que estar entre 0 y 0.3
