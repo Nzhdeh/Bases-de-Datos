@@ -8,6 +8,56 @@ go
 --le coloque un NULL en la columna Sex y borre todas las reservas futuras de ese usuario. 
 --Ten en cuenta que si alguna de esas reservas tiene asociado un alquiler de material habrá que borrarlo también.
 
+alter procedure EliminarUsuario 
+
+	@Dni as char(9)
+
+as
+
+begin 
+
+	begin transaction
+
+		update Usuarios
+		set Sex=null
+		where @Dni=DNI
+
+		delete Materiales from Materiales as M
+		inner join ReservasMateriales as RM on M.id=RM.IDMaterial
+		inner join Reservas as R on RM.CodigoReserva=R.Codigo
+		inner join Usuarios as U on R.ID_Usuario = U.ID
+		where @Dni=U.DNI  
+
+		delete ReservasMateriales from ReservasMateriales as RM
+		inner join Reservas as R on RM.CodigoReserva=R.Codigo
+		inner join Usuarios as U on R.ID_Usuario = U.ID
+		where @Dni=U.DNI  
+
+		delete Reservas from Reservas as R
+		inner join Usuarios as U on R.ID_Usuario = U.ID
+		where @Dni=U.DNI  and R.Fecha_Hora>current_timestamp
+	--rollback
+	commit
+
+end
+go
+
+declare @Dni as char(9)
+set @DNI='59544420G'
+
+begin transaction
+
+execute EliminarUsuario @Dni
+
+rollback
+go
+select * from Usuarios
+
+select * from Reservas as R
+inner join Usuarios as U on R.ID_Usuario=U.ID
+where U.DNI='59544420G'
+
+select * from Usuarios
 --Ejercicio 2
 --Escribe un procedimiento que reciba como parámetros el código de una instalación y una fecha/hora 
 --(SmallDateTime) y devuelva en otro parámetro de salida el ID del usuario que la tenía alquilada 

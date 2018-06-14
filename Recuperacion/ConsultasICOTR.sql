@@ -53,7 +53,7 @@ order by IDRepartidor
 --7. Pedidos (ID, Nombre y apellidos del cliente, nombre del establecimiento e importe) que incluyan el sabor menos 
 --	vendido de cada ciudad. La ciudad se tomará del establecimiento.
 
-create view CasoBaseSabor as --todos los pedidos con que incluyen los sabores
+create view CasoBaseSabor as --todos los pedidos que incluyen los sabores
 select P.ID,E.Ciudad,H.Sabor,count(*) as [Numero de sabores] from ICPedidos as P
 inner join ICEstablecimientos as E on P.IDEstablecimiento=E.ID
 inner join ICHelados as H on P.ID=H.IDPedido
@@ -153,8 +153,14 @@ alter table ICClientes add constraint CK_TipoDescuento check(TipoDescuento betwe
 
 --13. Rellena la columna sumando 0.02 a todos los clientes que hayan hecho más de tres pedidos durante los meses de octubre a febrero.
 
-create view  PedidosMayoresQueTres as
-select ID,count(*) as [Pedidos] from ICPedidos
-where month(Recibido) in (10,11,12,1,2)/******************************************/
-group by ID
-having count(ID)>3
+begin transaction
+
+update ICClientes
+	set TipoDescuento=TipoDescuento+0.02
+from ICClientes as C
+	inner join ICPedidos as P on C.ID=P.IDCliente
+where P.ID>(select ID from ICPedidos
+			group by ID
+			having count(ID)>3)
+
+rollback
