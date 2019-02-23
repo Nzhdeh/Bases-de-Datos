@@ -62,6 +62,38 @@ select * from Usuarios
 --Escribe un procedimiento que reciba como parámetros el código de una instalación y una fecha/hora 
 --(SmallDateTime) y devuelva en otro parámetro de salida el ID del usuario que la tenía alquilada 
 --si en ese momento la instalación estaba ocupada. Si estaba libre, devolverá un NULL.
+go
+create procedure InstalacionReservada
+	@Codigo as int,
+	@FechaHora as smalldatetime,
+	@IDUsuario as char (12) output
+as 
+begin
+
+	select @IDUsuario=
+					(
+		
+						case
+							when R.ID_Usuario is null then null
+							else @IDUsuario
+						end
+					) 
+	from Usuarios as U
+	inner join Reservas as R on U.ID=R.ID_Usuario
+	--inner join Instalaciones as I on R.Cod_Instalacion=I.Codigo
+	where @Codigo=R.Cod_Instalacion and @FechaHora=R.Fecha_Hora
+
+end
+go
+
+declare @Codigo as int=2582
+declare	@FechaHora as smalldatetime='2008-12-12 14:00:00'
+declare	@IDUsuario as char (12)
+
+execute InstalacionReservada @Codigo,@FechaHora,@IDUsuario output
+
+select * from Usuarios
+select * from Reservas
 
 --Ejercicio 3
 --Escribe un procedimiento que reciba como parámetros el código de una instalación y dos fechas (DATE) 
